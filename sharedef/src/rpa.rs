@@ -19,6 +19,25 @@ impl RpaEngine {
             Self::PowerAutomate => "PAD.Robot.exe",
         }
     }
+
+    /// Gets the process name of the RPA enginge.
+    pub const fn process_name_lowercase(&self) -> &'static str {
+        match self {
+            Self::ProcessRobot => "processrobot.process.exe",
+            Self::PowerAutomate => "pad.robot.exe",
+        }
+    }
+
+
+    pub fn from_process_name(name: &str) -> Option<Self> {
+        if name.eq_ignore_ascii_case(Self::ProcessRobot.process_name()) {
+            Some(Self::ProcessRobot)
+        } else if name.eq_ignore_ascii_case(Self::PowerAutomate.process_name()) {
+            Some(Self::PowerAutomate)
+        } else {
+            None
+        }
+    }
 }
 
 impl fmt::Display for RpaEngine {
@@ -34,7 +53,6 @@ impl fmt::Display for RpaEngine {
 pub struct RpaData {
     pub pid: u32,
     pub engine: RpaEngine,
-    pub process: String,
     pub computer: String,
     pub env: Option<String>,
     pub run_id: String,
