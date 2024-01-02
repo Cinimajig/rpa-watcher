@@ -3,13 +3,13 @@ use windows::Win32::{Foundation::*, Security::*, System::Threading::*};
 
 pub fn enable_debug_priv() -> windows::core::Result<()> {
     unsafe {
-        let mut token = HANDLE::default();
+        let mut token = crate::handles::SafeHandle::<false>(HANDLE::default());
         let mut luid = LUID::default();
         
         OpenProcessToken(
             GetCurrentProcess(),
             TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
-            &mut token,
+            &mut *token,
         )?;
 
         LookupPrivilegeValueW(None, SE_DEBUG_NAME, &mut luid)?;
@@ -23,7 +23,7 @@ pub fn enable_debug_priv() -> windows::core::Result<()> {
         };
 
         AdjustTokenPrivileges(
-            token,
+            *token,
             false,
             Some(&tkp),
             mem::size_of::<TOKEN_PRIVILEGES>() as _,

@@ -69,22 +69,23 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
     let mut handles: Vec<(SafeHandle, u32)> = Vec::with_capacity(10);
 
     unsafe {
-        let mut entry = PROCESSENTRY32W {
-            dwSize: mem::size_of::<PROCESSENTRY32W>() as _,
+        let mut entry = PROCESSENTRY32 {
+            dwSize: mem::size_of::<PROCESSENTRY32>() as _,
             ..Default::default()
         };
         let snapshot = SafeHandle::<true>(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)?);
 
         // First process is always PID 0 (System Process). it's needed for Process32Next.
-        Process32FirstW(*snapshot, &mut entry)?;
+        // Not using Wide-functions, since the manifest forces UTF-8.
+        Process32First(*snapshot, &mut entry)?;
 
         // Iterate over all other processes.
-        while let Ok(_) = Process32NextW(*snapshot, &mut entry) {
+        while let Ok(_) = Process32Next(*snapshot, &mut entry) {
             let size = (0usize..).take_while(|i| entry.szExeFile[*i] != 0).count();
-            let name = String::from_utf16_lossy(&entry.szExeFile[..size]);
+            let name = &entry.szExeFile[..size];
 
             for file in files {
-                if file.eq_ignore_ascii_case(&name) {
+                if file.as_bytes().eq_ignore_ascii_case(name) {
                     let process =
                         SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
                     handles.push((process, entry.th32ProcessID));

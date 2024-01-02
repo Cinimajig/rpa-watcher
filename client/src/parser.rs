@@ -1,6 +1,9 @@
 use std::io;
 use sharedef::rpa::*;
 
+const GUID_LENGTH: usize = 36;
+const SMALL_GUID_LENGTH: usize = 32;
+
 pub fn from_args(pid: u32, args: &str, hostname: &str) -> io::Result<RpaData> {
     let args = args.to_ascii_lowercase();
 
@@ -15,11 +18,11 @@ pub fn from_args(pid: u32, args: &str, hostname: &str) -> io::Result<RpaData> {
     };
 
     let run_id = match engine {
-        RpaEngine::ProcessRobot => match find_parameter(&args, "--instanceid=\"", 36) {
+        RpaEngine::ProcessRobot => match find_parameter(&args, "--instanceid=\"", GUID_LENGTH) {
             Some(run_id) => run_id.to_string(),
             None => return Err(io::Error::new(io::ErrorKind::NotFound, "instanceId was not found")),
         },
-        RpaEngine::PowerAutomate => match find_parameter(&args, "--runid ", 32) {
+        RpaEngine::PowerAutomate => match find_parameter(&args, "--runid ", SMALL_GUID_LENGTH) {
             Some(run_id) => format!("{}-{}-{}-{}-{}", &run_id[..8], &run_id[8..12], &run_id[12..16], &run_id[16..20], &run_id[20..]),
             None => return Err(io::Error::new(io::ErrorKind::NotFound, "runId was not found")),
         },
@@ -32,10 +35,11 @@ pub fn from_args(pid: u32, args: &str, hostname: &str) -> io::Result<RpaData> {
 }
 
 fn find_parameter<'a>(cmdline_lc: &'a str, param: &'a str, length: usize) -> Option<&'a str> {
-    match cmdline_lc.find(param).map(|i| i + param.len()) {
-        Some(index) => Some(&cmdline_lc[index..index + length]),
-        None => None,
-    }
+    let Some(index) = cmdline_lc.find(param).map(|i| i + param.len()) else {
+        return None;
+    };
+    
+    Some(&cmdline_lc[index..index + length])
 }
 
 #[cfg(test)]
