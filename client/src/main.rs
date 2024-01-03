@@ -2,6 +2,7 @@ mod handles;
 mod privilage;
 mod process;
 mod parser;
+mod http;
 
 use std::{convert::Infallible, thread, time};
 use sharedef::{*, rpa::*};
@@ -33,7 +34,7 @@ fn main() -> Result<Infallible> {
                     continue;
                 };
 
-                
+                serde_json::to_string(&rpa_data)
             }
 
             SLEEP_SECONDS_LONG
