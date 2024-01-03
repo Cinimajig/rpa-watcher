@@ -1,5 +1,5 @@
-use std::io;
 use sharedef::rpa::*;
+use std::io;
 
 const GUID_LENGTH: usize = 36;
 const SMALL_GUID_LENGTH: usize = 32;
@@ -9,37 +9,105 @@ pub fn from_args(pid: u32, args: &str, hostname: &str) -> io::Result<RpaData> {
 
     // Find the process.
     let Some(index_exe) = args.find(".exe") else {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "no process was found"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "no process was found",
+        ));
     };
 
     // Converts it to a RpaEngine if possible.
-    let Some(engine) = args[1..index_exe + 4].split('\\').last().and_then(RpaEngine::from_process_name) else {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "no engine was found")); 
+    let Some(engine) = args[1..index_exe + 4]
+        .split('\\')
+        .last()
+        .and_then(RpaEngine::from_process_name)
+    else {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "no engine was found",
+        ));
     };
 
     let run_id = match engine {
         RpaEngine::ProcessRobot => match find_parameter(&args, "--instanceid=\"", GUID_LENGTH) {
             Some(run_id) => run_id.to_string(),
-            None => return Err(io::Error::new(io::ErrorKind::NotFound, "instanceId was not found")),
+            None => {
+                return Err(io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "instanceId was not found",
+                ))
+            }
         },
         RpaEngine::PowerAutomate => match find_parameter(&args, "--runid ", SMALL_GUID_LENGTH) {
-            Some(run_id) => format!("{}-{}-{}-{}-{}", &run_id[..8], &run_id[8..12], &run_id[12..16], &run_id[16..20], &run_id[20..]),
-            None => return Err(io::Error::new(io::ErrorKind::NotFound, "runId was not found")),
+            Some(run_id) => format!(
+                "{}-{}-{}-{}-{}",
+                &run_id[..8],
+                &run_id[8..12],
+                &run_id[12..16],
+                &run_id[16..20],
+                &run_id[20..]
+            ),
+            None => {
+                return Err(io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "runId was not found",
+                ))
+            }
         },
     };
 
-    
+    let env = match engine {
+        RpaEngine::PowerAutomate => {
+            find_parameter(&args, "--environmentname \"", GUID_LENGTH).map(|s| s.to_string())
+        }
+        // TODO! decode --serverBaseUriB64?
+        RpaEngine::ProcessRobot => None,
+    };
 
+    let flow_id = match engine {
+        RpaEngine::PowerAutomate => {
+            find_parameter(&args, "--flowid ", SMALL_GUID_LENGTH).and_then(|s| {
+                Some(format!(
+                    "{}-{}-{}-{}-{}",
+                    &s[..8],
+                    &s[8..12],
+                    &s[12..16],
+                    &s[16..20],
+                    &s[20..]
+                ))
+            })
+        }
+        RpaEngine::ProcessRobot => None,
+    };
 
-    todo!();
+    let tenant_id = match engine {
+        RpaEngine::PowerAutomate => find_parameter(&args, "--tenantid \"", GUID_LENGTH),
+        // TODO! decode --serverBaseUriB64?
+        RpaEngine::ProcessRobot => None,
+    };
+
+    let azure_data = match (flow_id, tenant_id) {
+        (Some(f), Some(t)) => Some(AzureData {
+            flow_id: f,
+            tenant_id: t.to_string(),
+        }),
+        _ => None,
+    };
+
+    Ok(RpaData {
+        pid,
+        engine,
+        computer: hostname.to_string(),
+        env,
+        run_id,
+        azure_data,
+    })
 }
 
 fn find_parameter<'a>(cmdline_lc: &'a str, param: &'a str, length: usize) -> Option<&'a str> {
-    let Some(index) = cmdline_lc.find(param).map(|i| i + param.len()) else {
-        return None;
-    };
-    
-    Some(&cmdline_lc[index..index + length])
+    cmdline_lc
+        .find(param)
+        .map(|i| i + param.len())
+        .map(|index| &cmdline_lc[index..index + length])
 }
 
 #[cfg(test)]

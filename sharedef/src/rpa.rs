@@ -62,7 +62,10 @@ pub struct RpaData {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Default))]
-pub struct AzureData {}
+pub struct AzureData {
+    pub flow_id: String,
+    pub tenant_id: String,
+}
 
 #[cfg(test)]
 mod tests {
