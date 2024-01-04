@@ -1,7 +1,6 @@
 mod handles;
 mod privilage;
 mod process;
-mod parser;
 mod http;
 
 use std::{convert::Infallible, thread, time};
@@ -14,29 +13,37 @@ const RPA_PROCESSES: &[&str] = &[
 ];
 
 fn main() -> Result<Infallible> {
+    // Enable debug privilages.
     privilage::enable_debug_priv()?;
 
+    // Get the hostname.
     let comp_name: String = get_hostname()?;
+
+    // A vector of running processes/flows.
+    let mut items: Vec<RpaData> = Vec::with_capacity(10);
 
     loop {
         let seconds_to_sleep = 'process_lookup: {
+            // Get a handle and pid to all relevant processes.
             let processes = process::find_processes(RPA_PROCESSES)?;
             if processes.len() == 0 {
                 break 'process_lookup SLEEP_SECONDS_SHORT;
             }
 
+            // Get's the commandline for each and constructs an RpaData structure.
             for (process, pid) in processes {
                 let Ok(cmdline) = process::get_cmdline(*process) else {
                     continue;
                 };
 
-                let Ok(rpa_data) = parser::from_args(pid, &cmdline, &comp_name) else {
+                let Ok(rpa_data) = RpaData::from_cmdline(pid, &cmdline, &comp_name) else {
                     continue;
                 };
 
-                serde_json::to_string(&rpa_data)
+                items.push(rpa_data);
             }
 
+            items.clear();
             SLEEP_SECONDS_LONG
         };
 

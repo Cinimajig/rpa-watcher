@@ -1,8 +1,11 @@
 use std::ops::{Deref, DerefMut};
 use windows::Win32::Foundation::*;
 
-const DEBUG_MODE: bool = cfg!(debug_assertions);
+pub const DEBUG_MODE: bool = cfg!(debug_assertions);
 
+/// A Wrapper type, that captures a `HANDLE` and then calls `CloseHandle` when dropped.
+/// 
+/// If the handle shouldn't call `CloseHandle`, then don't use this struct.
 #[repr(transparent)]
 pub struct SafeHandle<const SUPRESS: bool = {!DEBUG_MODE}>(pub HANDLE);
 

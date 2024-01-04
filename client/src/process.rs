@@ -69,13 +69,15 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
     let mut handles: Vec<(SafeHandle, u32)> = Vec::with_capacity(10);
 
     unsafe {
+        // Using the ASCII version, because of `activeCodePage` in the app-manifest.
+        // Meaning ASCII == UTF-8.
         let mut entry = PROCESSENTRY32 {
             dwSize: mem::size_of::<PROCESSENTRY32>() as _,
             ..Default::default()
         };
         let snapshot = SafeHandle::<true>(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)?);
 
-        // First process is always PID 0 (System Process). it's needed for Process32Next.
+        // First process is always PID 0 or 4 (System Process). it's needed for Process32Next.
         // Not using Wide-functions, since the manifest forces UTF-8.
         Process32First(*snapshot, &mut entry)?;
 

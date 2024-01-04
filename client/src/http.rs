@@ -1,22 +1,14 @@
 use std::time;
 
-use curl::easy::{Easy, List};
 
-pub fn create_client() -> Result<Easy, curl::Error> {
-    let mut client = Easy::new();
-    client.connect_timeout(time::Duration::from_millis(300));
-    
-    let mut list = List::new();
-    list.append("Content-Type: application/json; charset=utf-8")?;
-    client.http_headers(list);
+pub fn post(url: &str, token: &str, data: &str) -> Result<(), ureq::Error> {
+    let res = ureq::post(url)
+    .set("Api-Token", token)
+    .send_string(data)?;
 
-    todo!();
-
-    Ok(client)
-}
-
-pub fn post(client: &mut Easy, data: String) -> Result<(), curl::Error> {
-    
-
-    Ok(())
+    if res.status() > 200 && res.status() < 300 {
+        Ok(())
+    } else {
+        Err(ureq::Error::from(res))
+    }
 }
