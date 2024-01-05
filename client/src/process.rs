@@ -77,7 +77,7 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
         };
         let snapshot = SafeHandle::<true>(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)?);
 
-        // First process is always PID 0 or 4 (System Process). it's needed for Process32Next.
+        // First process is always PID 0 or 4 (System Processes). it's needed for Process32Next.
         // Not using Wide-functions, since the manifest forces UTF-8.
         Process32First(*snapshot, &mut entry)?;
 
