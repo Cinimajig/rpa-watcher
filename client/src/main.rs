@@ -2,17 +2,28 @@ mod handles;
 mod privilage;
 mod process;
 mod http;
+mod env;
+mod dbg;
 
-use std::{convert::Infallible, thread, time};
+use std::{convert::Infallible, thread, time, io};
 use sharedef::{*, rpa::*};
 use windows::core::*;
+use dbg::*;
 
 const RPA_PROCESSES: &[&str] = &[
     RpaEngine::PowerAutomate.process_name(), 
     RpaEngine::ProcessRobot.process_name(),
 ];
 
-fn main() -> Result<Infallible> {
+fn main() -> io::Result<Infallible> {
+    let env = match env::Environment::from_env().or(env::Environment::from_file()) {
+        Ok(this) => this,
+        Err(err) => {
+            dbg_output(format!("<RPA.Watcher> Error: {err:?}"));
+            return Err(err);
+        },
+    };
+
     // Enable debug privilages.
     privilage::enable_debug_priv()?;
 
@@ -21,6 +32,8 @@ fn main() -> Result<Infallible> {
 
     // A vector of running processes/flows.
     let mut items: Vec<RpaData> = Vec::with_capacity(10);
+
+    dbg_output("<RPA.Watcher> Initialization complete.");
 
     loop {
         let seconds_to_sleep = 'process_lookup: {
@@ -41,6 +54,11 @@ fn main() -> Result<Infallible> {
                 };
 
                 items.push(rpa_data);
+            }
+
+            match http::post(&env.url, &env.token, &items) {
+                Ok(_) => (),
+                Err(err) => dbg_output(err),
             }
 
             items.clear();
