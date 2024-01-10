@@ -16,13 +16,7 @@ const RPA_PROCESSES: &[&str] = &[
 ];
 
 fn main() -> io::Result<Infallible> {
-    let env = match env::Environment::from_env().or(env::Environment::from_file()) {
-        Ok(this) => this,
-        Err(err) => {
-            dbg_output(format!("<RPA.Watcher> Error: {err:?}"));
-            return Err(err);
-        },
-    };
+    let env = env::Environment::from_file_then_env();
 
     // Enable debug privilages.
     privilage::enable_debug_priv()?;
