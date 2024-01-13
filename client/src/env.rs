@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::{io, env, fs};
 
 const DEFAULT_URL: &str = "http://localhost/api/checkin";
@@ -30,6 +32,7 @@ impl Environment {
 
         this
     }
+
 
     pub fn from_env() -> Result<Self, env::VarError> {
         let url = env::var("RW_URL")?;
