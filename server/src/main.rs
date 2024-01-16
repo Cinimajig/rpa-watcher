@@ -1,9 +1,9 @@
+mod api;
+
+use rocket::fs::FileServer;
+
 #[macro_use] extern crate rocket;
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
 
 #[launch]
 fn rocket() -> _ {
@@ -11,7 +11,8 @@ fn rocket() -> _ {
 
     rocket::build()
     .configure(&cfg)
-    .mount("/", routes![index])
+    .mount("/api", routes![api::check_in])
+    .mount("/", FileServer::from("wwwroot/"))
 }
 
 fn load_config() -> rocket::Config {
@@ -23,7 +24,4 @@ fn load_config() -> rocket::Config {
     };
 
     todo!()
-
-
-    config
 }
