@@ -8,5 +8,5 @@ resolver = "2"
 members = [
     "server",
     "client",
-    "sharedef",
+    "rpa-lib",
 ]

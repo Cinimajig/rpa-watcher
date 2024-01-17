@@ -6,7 +6,7 @@ mod env;
 mod dbg;
 
 use std::{convert::Infallible, thread, time, io};
-use sharedef::{*, rpa::*};
+use rpa::*;
 use windows::core::*;
 use dbg::*;
 

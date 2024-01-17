@@ -2,8 +2,8 @@ use std::time;
 
 const TIME_SECS: time::Duration = time::Duration::from_secs(2);
 
-pub fn post(url: &str, token: &str, data: &impl sharedef::serde::Serialize) -> Result<ureq::Response, ureq::Error> {
-    let body = sharedef::serde_json::to_string(data).unwrap_or("serialization failed.".to_string());
+pub fn post(url: &str, token: &str, data: &impl serde::Serialize) -> Result<ureq::Response, ureq::Error> {
+    let body = serde_json::to_string(data).unwrap_or("serialization failed.".to_string());
     
     let res = ureq::post(url)
     .timeout(TIME_SECS)
