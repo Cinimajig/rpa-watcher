@@ -4,7 +4,7 @@ const GUID_LENGTH: usize = 36;
 const SMALL_GUID_LENGTH: usize = 32;
 
 /// Enum of RPA engings to watch.
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
 #[cfg_attr(test, derive(Default))]
 pub enum RpaEngine {
@@ -49,7 +49,7 @@ impl fmt::Display for RpaEngine {
 }
 
 /// Collection of relevant data for the client to watch and send to the server.
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Default))]
 pub struct RpaData {
@@ -165,7 +165,7 @@ impl RpaData {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Default))]
 pub struct AzureData {
