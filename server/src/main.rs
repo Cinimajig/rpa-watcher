@@ -1,9 +1,12 @@
 mod api;
+mod state;
 
 use axum::{routing::get, Router};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt::init();
+    
     let app = Router::new()
         .route("/", get(root))
         .nest("/api", api::router());

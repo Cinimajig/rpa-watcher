@@ -208,4 +208,17 @@ mod tests {
 
         RpaData::from_cmdline(pid, &cmdline, "localhost").unwrap();
     }
+
+    #[test]
+    fn from_json() {
+        // TODO! Fix Deserializing.
+        serde_json::from_str(r#"{
+            "pid": 1234,
+            "engine": "Power Automate",
+            "computer": "Desktop",
+            "env": "12312313",
+            "instance": "sadsadasdasd",
+            "azureData": null
+          }"#).unwrap()
+    }
 }
