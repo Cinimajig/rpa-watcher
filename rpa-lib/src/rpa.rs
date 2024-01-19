@@ -6,7 +6,7 @@ const SMALL_GUID_LENGTH: usize = 32;
 /// Enum of RPA engings to watch.
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
-#[cfg_attr(test, derive(Default))]
+#[cfg_attr(test, derive(Default, Debug))]
 pub enum RpaEngine {
     #[cfg_attr(test, default)]
     ProcessRobot,
@@ -51,7 +51,7 @@ impl fmt::Display for RpaEngine {
 /// Collection of relevant data for the client to watch and send to the server.
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-#[cfg_attr(test, derive(Default))]
+#[cfg_attr(test, derive(Default, Debug))]
 pub struct RpaData {
     pub pid: u32,
     pub engine: RpaEngine,
@@ -172,7 +172,7 @@ impl RpaData {
 
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-#[cfg_attr(test, derive(Default))]
+#[cfg_attr(test, derive(Default, Debug))]
 pub struct AzureData {
     pub flow_id: String,
     pub tenant_id: String,
@@ -215,15 +215,19 @@ mod tests {
     }
 
     #[test]
-    fn from_json() {
-        // TODO! Fix Deserializing.
-        serde_json::from_str(r#"{
-            "pid": 1234,
-            "engine": "Power Automate",
-            "computer": "Desktop",
-            "env": "12312313",
-            "instance": "sadsadasdasd",
-            "azureData": null
-          }"#).unwrap()
+    fn to_and_from_json() {
+        let data = RpaData {
+            pid: 1234,
+            engine: RpaEngine::PowerAutomate,
+            computer: "hostname".to_string(),
+            env: Some("rand-env".to_string()),
+            instance: "rand-inst".to_string(),
+            azure_data: None,
+        };
+
+        let json = serde_json::to_string_pretty(&data);
+        assert!(true == json.is_ok());
+
+        assert!(true == serde_json::from_str::<RpaData>(&json.unwrap()).is_ok());
     }
 }
