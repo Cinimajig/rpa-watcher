@@ -1,11 +1,14 @@
 use axum::{Router, http::StatusCode};
+use tower_http::services::ServeDir;
 
 pub fn serve_view_dir() -> Router {
-    use tower_http::services::ServeDir;
-
     Router::new()
-    .nest_service("/view", ServeDir::new("wwwroot"))
-    .fallback(not_found)
+    .route_service("/view", serve_dir_service())
+    // .fallback(not_found)
+}
+
+pub fn serve_dir_service() -> ServeDir {
+    ServeDir::new("wwwroot/view")
 }
 
 async fn not_found() -> StatusCode {

@@ -17,7 +17,6 @@ pub fn router() -> Router {
         // .route("/listener", get(ws_handler))
         .route("/getrpa", get(get_rpadata))
         .route("/checkin", post(post_checkin))
-        .fallback(not_found)
         .with_state(buffer_data)
 }
 
