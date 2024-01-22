@@ -6,8 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.7.4"
+axum = { version = "0.7.4" }
 serde = "1.0.193"
 serde_json = "1.0.108"
 rpa = { path = "../rpa-lib" }
 tokio = { version = "1.35.1", features = ["full"] }
+tower-http = { version = "0.5.1", features = ["fs"] }

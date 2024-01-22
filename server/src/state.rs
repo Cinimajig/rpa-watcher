@@ -2,6 +2,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 
 #[derive(Clone)]
+#[repr(transparent)]
 pub struct AppState<T> {
     pub data: Arc<Mutex<T>>
 }
