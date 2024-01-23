@@ -1,41 +1,34 @@
 mod api;
-mod view;
 mod state;
+mod view;
 
-use axum::{routing::get, Router, http::StatusCode, response::Redirect};
+use axum::{
+    handler::HandlerWithoutStateExt,
+    http::{StatusCode, Uri},
+    response::Redirect,
+    routing::get,
+    Router, ServiceExt,
+};
+use tower_http::services::{ServeDir, ServeFile};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
-        .route("/", get(redirect))
-        .nest_service("/view", view::serve_dir_service())
+        .nest_service(
+            "/",
+            ServeDir::new("wwwroot")
+            .not_found_service(fallback.into_service()),
+        )
         .nest("/api", api::router());
-
-    // let view_app = view::serve_view_dir();
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await?;
     axum::serve(listener, app).await?;
 
-    // let api_listener = tokio::spawn(async move {
-    //     axum::serve(tokio::net::TcpListener::bind("0.0.0.0:1997").await.unwrap(), api_app).await
-    // });
-    // let view_listener = tokio::spawn(async move {
-    //     axum::serve(
-    //         tokio::net::TcpListener::bind("0.0.0.0:80").await.unwrap(), view_app
-    //     ).await
-    // });
-
-    // let (api, view) = tokio::join!(api_listener, view_listener);
-    // assert_eq!(true, api.and(view).is_ok());
-
     Ok(())
 }
 
-// basic handler that responds with a static string
-async fn redirect() -> Redirect {
-    Redirect::permanent("/view")
-}
-
-async fn not_found() -> StatusCode {
-    StatusCode::NOT_FOUND
+async fn fallback(uri: Uri) -> (StatusCode, String) {
+    let s = format!("No route found for {uri}");
+    println!("{}", &s);
+    (StatusCode::NOT_FOUND, s)
 }

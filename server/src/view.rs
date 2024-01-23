@@ -8,7 +8,7 @@ pub fn serve_view_dir() -> Router {
 }
 
 pub fn serve_dir_service() -> ServeDir {
-    ServeDir::new("wwwroot/view")
+    ServeDir::new("wwwroot")
 }
 
 async fn not_found() -> StatusCode {
