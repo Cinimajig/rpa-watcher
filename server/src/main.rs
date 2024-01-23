@@ -1,23 +1,19 @@
 mod api;
 mod state;
-mod view;
 
 use axum::{
     handler::HandlerWithoutStateExt,
     http::{StatusCode, Uri},
-    response::Redirect,
-    routing::get,
-    Router, ServiceExt,
+    Router,
 };
-use tower_http::services::{ServeDir, ServeFile};
+use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .nest_service(
             "/",
-            ServeDir::new("wwwroot")
-            .not_found_service(fallback.into_service()),
+            ServeDir::new("wwwroot").not_found_service(fallback.into_service()),
         )
         .nest("/api", api::router());
 

@@ -19,15 +19,13 @@ pub fn router() -> Router {
         .fallback(crate::fallback)
 }
 
-async fn get_rpadata(headers: HeaderMap, State(state): State<ApiState>) -> Json<Vec<RpaData>> {
-    println!("headers: {headers:?}");
-
+async fn get_rpadata(_headers: HeaderMap, State(state): State<ApiState>) -> Json<Vec<RpaData>> {
     let data = state.data.lock().await;
     Json(data.clone())
 }
 
 async fn post_checkin(
-    headers: HeaderMap,
+    _headers: HeaderMap,
     State(state): State<ApiState>,
     Json(payload): Json<Vec<RpaData>>,
 ) -> StatusCode {
