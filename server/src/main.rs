@@ -17,6 +17,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .nest("/api", api::router());
 
+    unsafe {
+        api::FAILED_RPADATA.write().await.reserve(20);
+    }
+
     let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await?;
     axum::serve(listener, app).await?;
 

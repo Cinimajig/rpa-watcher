@@ -1,1 +1,1 @@
-document.writeln('JS: Grillhest');
+const rpaView = document.querySelector('div#rpa-view');
