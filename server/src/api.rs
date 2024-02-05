@@ -6,7 +6,7 @@ use axum::{
     Json, Router,
 };
 use rpa::RpaData;
-use tokio::{sync::RwLock, time::Instant};
+use tokio::{sync::{RwLock, RwLockReadGuard}, time::Instant};
 
 type ApiState = AppState<Vec<RpaData>>;
 type FailedState = Vec<(Instant, RpaData)>;
@@ -15,14 +15,29 @@ type FailedState = Vec<(Instant, RpaData)>;
 /// Right now it's unsued.
 pub static mut FAILED_RPADATA: RwLock<FailedState> = RwLock::const_new(FailedState::new());
 
+#[inline]
+pub async fn read_failed_rpadata() -> RwLockReadGuard<'static, FailedState> {
+    unsafe {
+        FAILED_RPADATA.read().await
+    }
+}
+
 pub fn router() -> Router {
     let buffer_data: ApiState = ApiState::new(Vec::with_capacity(10));
 
     Router::new()
         .route("/getrpa", get(get_rpadata))
+        .route("/getfailed", get(get_failed_rpadata))
         .route("/checkin", post(post_checkin))
         .with_state(buffer_data)
         .fallback(crate::fallback)
+}
+
+async fn get_failed_rpadata(
+    // headers: HeaderMap,
+) -> Json<Vec<RpaData>> {
+    let data = read_failed_rpadata().await;
+    Json(data.iter().map(|r| r.1.clone()).collect())
 }
 
 async fn get_rpadata(
