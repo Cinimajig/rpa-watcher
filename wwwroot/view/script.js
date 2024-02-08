@@ -28,6 +28,10 @@ const buildRpaConvas = async () => {
     }
 
     for (let rpa of rpaData.entries()) {
+        if (document.querySelector(`div.rpa-info[data-ref="${rpa[0]}"`)) {
+            continue;
+        }
+
         const template = document.querySelector('template.rpa-info').content.cloneNode(true);
         const div = template.querySelector('div.rpa-info');
 
@@ -36,23 +40,20 @@ const buildRpaConvas = async () => {
         const hostname = div.querySelector('div.hostname');
         const env = div.querySelector('div.env');
         const instance = div.querySelector('div.instance');
-        const runInfo = div.querySelector('div.run-info');
 
-        engine.innerText = rpaData;
+        engine.innerText = rpaData[1].engine;
+        hostname.innerText = rpaData[1].computer;
+        env.innerText = rpaData[1].env ? rpaData[1].env : '';
+        instance.innerText = rpaData[1].instance;
+
+        rpaView.appendChild(div);
     }
 }
 
-const getRpaRunIds = () => {
-    rpaData.keys()
-}
+const getRpaRunIds = () => rpaData.keys();
 
-const getRpaData = async () => {
-    return await fetch('/api/getrpa')
-}
-
-const getFailedRpaData = async () => {
-
-}
+const getRpaData = async () => await fetch('/api/getrpa');
+const getFailedRpaData = async () => {}
 
 const clearCanvas = () => {
     rpaData.clear();
