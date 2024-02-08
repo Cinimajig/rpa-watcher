@@ -4,7 +4,7 @@ const rpaView = document.querySelector('div#rpa-view');
 let rpaData = new Map();
 let failedRpaData = new Map();
 
-setTimeout(() => {
+setInterval(() => {
     buildRpaConvas().catch((err) => {
         clearCanvas();
         console.error(err);

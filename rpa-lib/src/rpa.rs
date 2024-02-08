@@ -4,9 +4,9 @@ const GUID_LENGTH: usize = 36;
 const SMALL_GUID_LENGTH: usize = 32;
 
 /// Enum of RPA engings to watch.
-#[derive(serde::Serialize, serde::Deserialize, Clone)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
-#[cfg_attr(test, derive(Default, Debug))]
+#[cfg_attr(test, derive(Default))]
 pub enum RpaEngine {
     #[cfg_attr(test, default)]
     ProcessRobot,
@@ -49,9 +49,9 @@ impl fmt::Display for RpaEngine {
 }
 
 /// Collection of relevant data for the client to watch and send to the server.
-#[derive(serde::Serialize, serde::Deserialize, Clone)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-#[cfg_attr(test, derive(Default, Debug))]
+#[cfg_attr(test, derive(Default))]
 pub struct RpaData {
     pub pid: u32,
     pub engine: RpaEngine,
@@ -172,7 +172,7 @@ impl RpaData {
 
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-#[cfg_attr(test, derive(Default, Debug))]
+#[derive(Default, Debug)]
 pub struct AzureData {
     pub flow_id: String,
     pub tenant_id: String,

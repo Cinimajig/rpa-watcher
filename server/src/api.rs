@@ -44,7 +44,12 @@ async fn get_rpadata(
     // headers: HeaderMap, 
     State(state): State<ApiState>
 ) -> Json<Vec<RpaData>> {
+
     let data = state.data.read().await;
+
+    #[cfg(debug_assertions)]
+    println!("Sending {} items", data.len());
+
     Json(data.clone())
 }
 
@@ -53,9 +58,15 @@ async fn post_checkin(
     State(state): State<ApiState>,
     Json(payload): Json<Vec<RpaData>>,
 ) -> StatusCode {
+    #[cfg(debug_assertions)]
+    println!("Recieved packet: {:?}", payload);
+    
     if payload.is_empty() {
         return StatusCode::NO_CONTENT
     }
+
+    #[cfg(debug_assertions)]
+    println!("\tAdded to state");
 
     let mut data = state.data.write().await;
     payload.into_iter().for_each(|item| data.push(item));
