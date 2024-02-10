@@ -1,14 +1,14 @@
 use std::time;
 
-const TIME_SECS: time::Duration = time::Duration::from_secs(2);
+// const TIME_SECS: time::Duration = time::Duration::from_secs(2);
 
 pub fn post(url: &str, token: &str, data: &impl serde::Serialize) -> Result<ureq::Response, ureq::Error> {
-    let body = serde_json::to_string(data).unwrap_or("serialization failed.".to_string());
+    // let body = serde_json::to_string(data).unwrap_or("serialization failed.".to_string());
     
     let res = ureq::post(url)
-    .timeout(TIME_SECS)
+    // .timeout(TIME_SECS)
     .set("Api-Token", token)
-    .send_string(&body)?;
+    .send_json(&data)?;
     Ok(res)
 
     // if res.status() > 200 && res.status() < 300 {

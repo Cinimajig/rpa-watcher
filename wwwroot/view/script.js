@@ -4,13 +4,6 @@ const rpaView = document.querySelector('div#rpa-view');
 let rpaData = new Map();
 let failedRpaData = new Map();
 
-setInterval(() => {
-    buildRpaConvas().catch((err) => {
-        clearCanvas();
-        console.error(err);
-    })
-}, timeoutSeconds * 1000);
-
 const buildRpaConvas = async () => {
     let data = await getRpaData();
     let failed = await getFailedRpaData();
@@ -40,11 +33,19 @@ const buildRpaConvas = async () => {
         const hostname = div.querySelector('div.hostname');
         const env = div.querySelector('div.env');
         const instance = div.querySelector('div.instance');
+        const flowId = div.querySelector('div.run-info div.name');
+        const teanantId = div.querySelector('div.run-info div.extra');
 
-        engine.innerText = rpaData[1].engine;
-        hostname.innerText = rpaData[1].computer;
-        env.innerText = rpaData[1].env ? rpaData[1].env : '';
-        instance.innerText = rpaData[1].instance;
+
+        engine.innerText = rpa[1].engine;
+        hostname.innerText = rpa[1].computer;
+        env.innerText = rpa[1].env ? rpa[1].env : '';
+        instance.innerText = rpa[1].instance;
+
+        if (rpa[1]?.azureData) {
+            flowId.innerText = rpa[1].azureData.flowId;
+            teanantId.innerText = rpa[1].azureData.tenantId;
+        }
 
         rpaView.appendChild(div);
     }
@@ -52,7 +53,7 @@ const buildRpaConvas = async () => {
 
 const getRpaRunIds = () => rpaData.keys();
 
-const getRpaData = async () => await fetch('/api/getrpa');
+const getRpaData = async () => (await fetch('/api/getrpa')).json();
 const getFailedRpaData = async () => {}
 
 const clearCanvas = () => {
@@ -68,3 +69,12 @@ const iteratorIncludes = (item, iter) => {
 
     return false;
 }
+
+
+setInterval(() => {
+    buildRpaConvas().catch((err) => {
+        clearCanvas();
+        console.error(err);
+    })
+}, timeoutSeconds * 1000);
+buildRpaConvas();
