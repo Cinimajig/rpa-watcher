@@ -29,12 +29,12 @@ const buildRpaConvas = async () => {
         const div = template.querySelector('div.rpa-info');
 
         div.setAttribute('data-ref', rpa[0]);
-        const engine = div.querySelector('div.engine');
-        const hostname = div.querySelector('div.hostname');
-        const env = div.querySelector('div.env');
-        const instance = div.querySelector('div.instance');
-        const flowId = div.querySelector('div.run-info div.name');
-        const teanantId = div.querySelector('div.run-info div.extra');
+        const engine = div.querySelector('div.engine p');
+        const hostname = div.querySelector('div.hostname p');
+        const env = div.querySelector('div.env p');
+        const instance = div.querySelector('div.instance p');
+        const flowId = div.querySelector('div.name p');
+        const teanantId = div.querySelector('div.extra p');
 
 
         engine.innerText = rpa[1].engine;

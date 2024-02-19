@@ -3,3 +3,11 @@ body {
     background-color: aliceblue;
 }
 
+main {
+    background-color: white;
+}
+
+div.column {
+    display: inline-grid;
+    grid-template-columns: 1fr repeat(6, 2fr);
+}
