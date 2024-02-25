@@ -1,4 +1,5 @@
-use crate::state::AppState;
+use std::sync::Arc;
+
 use axum::{
     extract::State,
     http::{HeaderMap, StatusCode},
@@ -8,22 +9,25 @@ use axum::{
 use rpa::RpaData;
 use tokio::{sync::{RwLock, RwLockReadGuard}, time::Instant};
 
-type ApiState = AppState<Vec<RpaData>>;
-type FailedState = Vec<(Instant, RpaData)>;
+type RpaItems = Vec<(Instant, RpaData)>;
 
-/// List of failed RPA-tasks. These will live for a day and then be cleared.
-/// Right now it's unsued.
-pub static mut FAILED_RPADATA: RwLock<FailedState> = RwLock::const_new(FailedState::new());
+#[derive(Clone)]
+pub struct RpaState {
+    pub success: Arc<RwLock<RpaItems>>,
+    pub failed: Arc<RwLock<RpaItems>>,
+}
 
-#[inline]
-pub async fn read_failed_rpadata() -> RwLockReadGuard<'static, FailedState> {
-    unsafe {
-        FAILED_RPADATA.read().await
+impl RpaState {
+    pub fn new(sucess: RpaItems, failed: RpaItems) -> Self {
+        Self {
+            success: Arc::new(RwLock::new(sucess)),
+            failed: Arc::new(RwLock::new(failed)),
+        }
     }
 }
 
 pub fn router() -> Router {
-    let buffer_data: ApiState = ApiState::new(Vec::with_capacity(10));
+    let buffer_data: RpaState = RpaState::new(Vec::with_capacity(10), Vec::with_capacity(10));
 
     Router::new()
         .route("/getrpa", get(get_rpadata))
@@ -35,41 +39,42 @@ pub fn router() -> Router {
 
 async fn get_failed_rpadata(
     // headers: HeaderMap,
+    State(state): State<RpaState>
 ) -> Json<Vec<RpaData>> {
-    let data = read_failed_rpadata().await;
+    let data = state.failed.read().await;
     Json(data.iter().map(|r| r.1.clone()).collect())
 }
 
 async fn get_rpadata(
     // headers: HeaderMap, 
-    State(state): State<ApiState>
+    State(state): State<RpaState>
 ) -> Json<Vec<RpaData>> {
-
-    let data = state.data.read().await;
+    let data = state.success.read().await;
 
     #[cfg(debug_assertions)]
     println!("Sending {} items", data.len());
 
-    Json(data.clone())
+    Json(data.iter().map(|r| r.1.clone()).collect())
 }
 
 async fn post_checkin(
     // headers: HeaderMap,
-    State(state): State<ApiState>,
+    State(state): State<RpaState>,
     Json(payload): Json<Vec<RpaData>>,
 ) -> StatusCode {
     #[cfg(debug_assertions)]
-    println!("Recieved packet: {:?}", payload);
+    println!("Recieved payload: {:?}", payload);
     
     if payload.is_empty() {
-        return StatusCode::NO_CONTENT
+        return StatusCode::BAD_REQUEST
     }
 
     #[cfg(debug_assertions)]
     println!("\tAdded to state");
 
-    let mut data = state.data.write().await;
-    payload.into_iter().for_each(|item| data.push(item));
+    let now = Instant::now();
+    let mut data = state.success.write().await;
+    payload.into_iter().for_each(|item| data.push((now, item)));
     
     StatusCode::OK
 }
