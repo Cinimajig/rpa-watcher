@@ -111,3 +111,7 @@ async fn post_failed_checkin(
 
     StatusCode::OK
 }
+
+async fn cleanup_timer() {
+    todo!()
+}
