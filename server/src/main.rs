@@ -13,7 +13,7 @@ const DEFAULT_PORT: u16 = 80;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let port = match env::var("HTTP_PLATFORM_PORT") {
+    let port = match env::var("HTTP_PLATFORM_PORT").or(env::var("ASPNETCORE_PORT")) {
         Ok(port) => port.parse().unwrap_or(DEFAULT_PORT),
         _ => DEFAULT_PORT,
     };
@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn fallback(uri: Uri) -> (StatusCode, String) {
-    let s = format!("No route found for {uri}");
+    let s = format!("404 - No route found for {uri}");
     println!("{}", &s);
     (StatusCode::NOT_FOUND, s)
 }
