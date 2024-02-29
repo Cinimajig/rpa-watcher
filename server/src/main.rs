@@ -1,5 +1,7 @@
 mod api;
 
+use std::env;
+
 use axum::{
     handler::HandlerWithoutStateExt,
     http::{StatusCode, Uri},
@@ -7,8 +9,15 @@ use axum::{
 };
 use tower_http::services::ServeDir;
 
+const DEFAULT_PORT: u16 = 80;
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let port = match env::var("HTTP_PLATFORM_PORT") {
+        Ok(port) => port.parse().unwrap_or(DEFAULT_PORT),
+        _ => DEFAULT_PORT,
+    };
+
     let app = Router::new()
         .nest_service(
             "/",
@@ -16,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .nest("/api", api::router());
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await?;
+    let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
     axum::serve(listener, app).await?;
 
     Ok(())
