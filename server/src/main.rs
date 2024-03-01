@@ -1,6 +1,7 @@
 mod api;
+mod rpa_state;
 
-use std::env;
+use std::{env, future::IntoFuture};
 
 use axum::{
     handler::HandlerWithoutStateExt,
@@ -26,6 +27,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/api", api::router());
 
     let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
+
+    let _cleanup_job = tokio::spawn(api::cleanup_timer());
     axum::serve(listener, app).await?;
 
     Ok(())

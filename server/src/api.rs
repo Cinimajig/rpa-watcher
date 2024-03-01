@@ -1,19 +1,15 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
+use crate::rpa_state::*;
 use axum::{
-    extract::State,
     http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
 use rpa::RpaData;
-use tokio::{
-    sync::RwLock,
-    time::Instant,
-};
+use tokio::{sync::RwLock, time::Instant};
 
-type RpaValue = (Instant, RpaData);
-type RpaItems = HashMap<String, RpaValue>;
+const CLEANUP_TIMER_INTERVAL: u64 = 5;
 
 #[derive(Clone)]
 pub struct RpaState {
@@ -31,32 +27,29 @@ impl RpaState {
 }
 
 pub fn router() -> Router {
-    let buffer_data: RpaState = RpaState::new(
-        HashMap::with_capacity(10), HashMap::with_capacity(20)
-    );
+    // let buffer_data: RpaState = RpaState::new(
+    //     HashMap::with_capacity(10), HashMap::with_capacity(20)
+    // );
 
     Router::new()
         .route("/getrpa", get(get_rpadata))
         .route("/getfailed", get(get_failed_rpadata))
         .route("/checkin", post(post_checkin))
-        .route("/checkinfailed", post(post_failed_checkin))
-        .with_state(buffer_data)
+        // .with_state(buffer_data)
         .fallback(crate::fallback)
 }
 
-async fn get_failed_rpadata(
-    // headers: HeaderMap,
-    State(state): State<RpaState>,
+async fn get_failed_rpadata(// headers: HeaderMap,
+    // State(state): State<RpaState>,
 ) -> Json<Vec<RpaData>> {
-    let data = state.failed.read().await;
+    let data = rpa_f().await;
     Json(data.iter().map(|(_k, v)| v.1.clone()).collect())
 }
 
-async fn get_rpadata(
-    // headers: HeaderMap,
-    State(state): State<RpaState>,
+async fn get_rpadata(// headers: HeaderMap,
+    // State(state): State<RpaState>,
 ) -> Json<Vec<RpaData>> {
-    let data = state.success.read().await;
+    let data = rpa_s().await;
 
     #[cfg(debug_assertions)]
     println!("Sending {} items", data.len());
@@ -66,7 +59,7 @@ async fn get_rpadata(
 
 async fn post_checkin(
     // headers: HeaderMap,
-    State(state): State<RpaState>,
+    // State(state): State<RpaState>,
     Json(payload): Json<Vec<RpaData>>,
 ) -> StatusCode {
     #[cfg(debug_assertions)]
@@ -80,7 +73,7 @@ async fn post_checkin(
     println!("\tAdded to state");
 
     let now = Instant::now();
-    let mut data = state.success.write().await;
+    let mut data = rpa_s_mut().await;
     for item in payload.into_iter() {
         data.insert(item.instance.clone(), (now, item));
     }
@@ -88,30 +81,16 @@ async fn post_checkin(
     StatusCode::OK
 }
 
-async fn post_failed_checkin(
-    // headers: HeaderMap,
-    State(state): State<RpaState>,
-    Json(payload): Json<Vec<RpaData>>,
-) -> StatusCode {
-    #[cfg(debug_assertions)]
-    println!("Recieved payload: {:?}", payload);
+pub async fn cleanup_timer() {
+    use tokio::time::*;
 
-    if payload.is_empty() {
-        return StatusCode::BAD_REQUEST;
+    loop {
+        sleep(Duration::from_secs(CLEANUP_TIMER_INTERVAL)).await;
+        
+        #[cfg(debug_assertions)]
+        println!("Cleaning up...");
+
+        let mut data = rpa_s_mut().await;
+        data.retain(|_k, v| v.0.elapsed().as_secs() < 60);        
     }
-
-    #[cfg(debug_assertions)]
-    println!("\tAdded to state");
-
-    let now = Instant::now();
-    let mut data = state.failed.write().await;
-    for item in payload.into_iter() {
-        data.insert(item.instance.clone(), (now, item));
-    }
-
-    StatusCode::OK
-}
-
-async fn cleanup_timer() {
-    todo!()
 }
