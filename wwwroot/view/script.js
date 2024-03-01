@@ -1,5 +1,6 @@
 const timeoutSeconds = 7;
 const rpaView = document.querySelector('#rpa-view');
+const info = document.querySelector('.no-info');
 
 let rpaData = new Map();
 let failedRpaData = new Map();
@@ -23,6 +24,7 @@ const buildRpaConvas = async (clear) => {
     }
 
     for (let rpa of rpaData.entries()) {
+        info.style.display = '';
         if (document.querySelector(`.tr.rpa-info[data-ref="${rpa[0]}"`)) {
             continue;
         }
@@ -63,6 +65,12 @@ const buildRpaConvas = async (clear) => {
         }
 
         rpaView.appendChild(tr);
+    }
+
+    if (rpaData.size === 0) {
+        info.style.display = '';
+    } else {
+        info.style.display = 'none';
     }
 }
 
