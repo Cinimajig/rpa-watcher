@@ -1,39 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="stylesheet" href="style.css">
     <title>RPA-Wacther</title>
 </head>
+
 <body>
     <template class="rpa-info">
-        <div data-ref="" class="rpa-info column">
-            <div class="engine"><p></p></div>
-            <div class="hostname"><p></p></div>
-            <div class="env"><p></p></div>
-            <div class="instance"><p></p></div>
-            <div class="name"><p></p></div>
-            <div class="extra"><p></p></div>
+        <div data-ref="" class="tr rpa-info">
+            <div style="width: 7% !important;" class="td engine"></div>
+            <div style="width: 7% !important;" class="td hostname"></div>
+            <div class="td env"></div>
+            <div class="td instance"></div>
+            <div class="td name"></div>
+            <div class="td extra"></div>
         </div>
     </template>
 
-    
+    <h1>RPA-Watcher</h1>
     <main>
-        <div class="column" id="rpa-header">
-            <div class="engine"><p>Engine</p></div>
-            <div class="hostname"><p>Host</p></div>
-            <div class="env"><p>Envirorment</p></div>
-            <div class="instance"><p>Instance</p></div>
-            <div class="name"><p>Flow</p></div>
-            <div class="extra"><p>Teanant</p></div>
+        <div class="table thead" id="rpa-header">
+            <div class="tr">
+                <div style="width: 7% !important;" class="td engine">Engine</div>
+                <div style="width: 7% !important;" class="td hostname">Host</div>
+                <div class="td env">Envirorment</div>
+                <div class="td instance">Instance</div>
+                <div class="td name">Flow</div>
+                <div class="td extra">Teanant</div>
+            </div>
         </div>
-        <div id="rpa-view">
-            
+
+        <div class="table tbody" id="rpa-view">
+        </div>
+
+        <div class="table tfoot">
+            <div class="tr">
+                <div class="td engine">Nothing to show...</div>
+                <div class="td hostname"></div>
+                <div class="td env"></div>
+                <div class="td instance"></div>
+                <div class="td name"></div>
+                <div class="td extra"></div>
+            </div>
         </div>
     </main>
 
-    
     <script type="module" src="script.js"></script>
 </body>
+
 </html>
