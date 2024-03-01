@@ -1,8 +1,7 @@
 mod api;
 mod rpa_state;
 
-use std::{env, future::IntoFuture};
-
+use std::env;
 use axum::{
     handler::HandlerWithoutStateExt,
     http::{StatusCode, Uri},
@@ -28,10 +27,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
 
-    let _cleanup_job = tokio::spawn(api::cleanup_timer());
+    let cleanup_job = tokio::spawn(api::cleanup_timer());
     axum::serve(listener, app).await?;
 
-    Ok(())
+    Ok(cleanup_job.await?)
 }
 
 async fn fallback(uri: Uri) -> (StatusCode, String) {

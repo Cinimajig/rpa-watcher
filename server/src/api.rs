@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::rpa_state::*;
 use axum::{
     http::StatusCode,
@@ -7,24 +5,9 @@ use axum::{
     Json, Router,
 };
 use rpa::RpaData;
-use tokio::{sync::RwLock, time::Instant};
+use tokio::time::Instant;
 
 const CLEANUP_TIMER_INTERVAL: u64 = 5;
-
-#[derive(Clone)]
-pub struct RpaState {
-    pub success: Arc<RwLock<RpaItems>>,
-    pub failed: Arc<RwLock<RpaItems>>,
-}
-
-impl RpaState {
-    pub fn new(sucess: RpaItems, failed: RpaItems) -> Self {
-        Self {
-            success: Arc::new(RwLock::new(sucess)),
-            failed: Arc::new(RwLock::new(failed)),
-        }
-    }
-}
 
 pub fn router() -> Router {
     // let buffer_data: RpaState = RpaState::new(
@@ -42,19 +25,20 @@ pub fn router() -> Router {
 async fn get_failed_rpadata(// headers: HeaderMap,
     // State(state): State<RpaState>,
 ) -> Json<Vec<RpaData>> {
-    let data = rpa_f().await;
-    Json(data.iter().map(|(_k, v)| v.1.clone()).collect())
+    let data = rpa_failed().await;
+    Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
 }
 
-async fn get_rpadata(// headers: HeaderMap,
+async fn get_rpadata(
+    // headers: HeaderMap,
     // State(state): State<RpaState>,
 ) -> Json<Vec<RpaData>> {
-    let data = rpa_s().await;
+    let data = success_rpa().await;
 
     #[cfg(debug_assertions)]
     println!("Sending {} items", data.len());
 
-    Json(data.iter().map(|(_k, v)| v.1.clone()).collect())
+    Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
 }
 
 async fn post_checkin(
@@ -73,9 +57,9 @@ async fn post_checkin(
     println!("\tAdded to state");
 
     let now = Instant::now();
-    let mut data = rpa_s_mut().await;
+    let mut data = success_rpa_mut().await;
     for item in payload.into_iter() {
-        data.insert(item.instance.clone(), (now, item));
+        data.insert(item.instance.clone(), RpaValue::new(now, item));
     }
 
     StatusCode::OK
@@ -90,7 +74,7 @@ pub async fn cleanup_timer() {
         #[cfg(debug_assertions)]
         println!("Cleaning up...");
 
-        let mut data = rpa_s_mut().await;
-        data.retain(|_k, v| v.0.elapsed().as_secs() < 60);        
+        let mut data = success_rpa_mut().await;
+        data.retain(|_k, v| v.timestamp.elapsed().as_secs() < 60);        
     }
 }

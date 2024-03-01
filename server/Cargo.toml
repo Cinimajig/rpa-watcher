@@ -12,4 +12,3 @@ serde_json = "1.0.108"
 rpa = { path = "../rpa-lib" }
 tokio = { version = "1.35.1", features = ["full"] }
 tower-http = { version = "0.5.1", features = ["fs"] }
-lazy_static = "1.4.0"
