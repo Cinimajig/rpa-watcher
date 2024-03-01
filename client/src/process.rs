@@ -82,7 +82,7 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
         Process32First(*snapshot, &mut entry)?;
 
         // Iterate over all other processes.
-        while let Ok(_) = Process32Next(*snapshot, &mut entry) {
+        while Process32Next(*snapshot, &mut entry).is_ok() {
             let size = (0usize..).take_while(|i| entry.szExeFile[*i] != 0).count();
             let name = &entry.szExeFile[..size];
 

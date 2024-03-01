@@ -1,4 +1,4 @@
-use std::time;
+
 
 // const TIME_SECS: time::Duration = time::Duration::from_secs(2);
 
@@ -8,7 +8,7 @@ pub fn post(url: &str, token: &str, data: &impl serde::Serialize) -> Result<ureq
     let res = ureq::post(url)
     // .timeout(TIME_SECS)
     .set("Api-Token", token)
-    .send_json(&data)?;
+    .send_json(data)?;
     Ok(res)
 
     // if res.status() > 200 && res.status() < 300 {
@@ -20,7 +20,7 @@ pub fn post(url: &str, token: &str, data: &impl serde::Serialize) -> Result<ureq
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
 
     #[test]
     fn get_request() -> Result<(), Box<dyn std::error::Error>> {

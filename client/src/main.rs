@@ -33,7 +33,7 @@ fn main() -> io::Result<Infallible> {
         let seconds_to_sleep = 'process_lookup: {
             // Get a handle and pid to all relevant processes.
             let processes = process::find_processes(RPA_PROCESSES)?;
-            if processes.len() == 0 {
+            if processes.is_empty() {
                 break 'process_lookup SLEEP_SECONDS_SHORT;
             }
 
