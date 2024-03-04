@@ -1,13 +1,22 @@
 @ECHO OFF
 
+:: BUILDING CLIENT AND SERVER.
 cargo build --release
 IF %ERRORLEVEL% NEQ 0 GOTO RETURN_LAST_ERROR
 
-RD dist
+MD target\dist
 
-Robocopy target\release dist *.exe *.ini *.dll
-IF %ERRORLEVEL% NEQ 0 GOTO RETURN_LAST_ERROR
+:: COPYING SERVER FILES.
+Robocopy target\release     target\dist\server          *srv*.exe /PURGE
+Robocopy wwwroot            target\dist\server\wwwroot  /MIR
 
+:: COPYING CLIENT FILES.
+Robocopy target\release     target\dist\client          *.exe *.ini /XF *srv*.exe /PURGE
+
+:: ZIPPING FILES.
+powershell -Command Compress-Archive target\dist\* target\rpa-watcher.zip
+
+:: DONE!
 ECHO Build ran with success. Files are located in the "dist" folder.
 
 :RETURN_LAST_ERROR

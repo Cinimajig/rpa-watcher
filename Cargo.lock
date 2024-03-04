@@ -625,7 +625,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rpa-watcher-server"
+name = "rpa-watcher-srv"
 version = "0.1.0"
 dependencies = [
  "axum",

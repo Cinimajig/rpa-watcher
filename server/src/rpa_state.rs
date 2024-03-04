@@ -29,6 +29,7 @@ pub async fn success_rpa_mut() -> RwLockWriteGuard<'static, RpaItems> {
         DATA_SUCESS.as_mut().unwrap().write().await
     }
 }
+
 pub async fn success_rpa() -> RwLockReadGuard<'static, RpaItems> {
     unsafe {
         if DATA_SUCESS.is_none() {
