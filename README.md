@@ -26,7 +26,7 @@ It consist of two components (well, three):
 | Platform       | Implemented | InstanceID | InstanceName | ClickableLink | AzureData |
 | -------------- | ----------- | ---------- | ------------ | ------------- | --------- |
 | [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | Planned | No | No |
-| [Power Automate](https://powerautomate.microsoft.com) | Yes | Yes | Planned | Yes | Yes |
+| [Power Automate Desktop](https://powerautomate.microsoft.com) | Yes | Yes | Planned | Yes | Yes |
 | [UIPath](https://uipath.com) | Not yet | No | No | No | Maybe? |
 | More to come | Not yet |  |  |  |  |
 
