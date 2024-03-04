@@ -50,14 +50,14 @@ const buildRpaConvas = async (clear) => {
                 break;
         }
 
-        engine.innerText = rpa[1].engine;
-        hostname.innerText = rpa[1].computer;
+        engine.innerText = rpa[1].engine.trim();
+        hostname.innerText = rpa[1].computer.trim();
         env.innerText = rpa[1].env ? rpa[1].env : '';
-        instance.innerText = rpa[1].instance;
+        instance.innerText = rpa[1].instance.trim();
 
         if (rpa[1]?.azureData) {
-            flowId.innerText = rpa[1].azureData.flowId;
-            teanantId.innerText = rpa[1].azureData.tenantId;
+            flowId.innerText = rpa[1].azureData.flowId.trim();
+            teanantId.innerText = rpa[1].azureData.tenantId.trim();
 
             if (engine.classList.contains('pad')) {
                 instance.innerHTML = `<a target="_blank" href="https://make.powerautomate.com/environments/${env.innerText}/uiflows/${flowId.innerText}/runs/${instance.innerText}">${instance.innerText}</a>`;
