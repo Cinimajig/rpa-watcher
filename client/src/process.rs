@@ -83,11 +83,11 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
 
         // Iterate over all other processes.
         while Process32Next(*snapshot, &mut entry).is_ok() {
-            let size = (0usize..).take_while(|i| entry.szExeFile[*i] != 0).count();
-            let name = &entry.szExeFile[..size];
-
+            // let size = (0usize..).take_while(|i| entry.szExeFile[*i] != 0).count();
+            // let name = &entry.szExeFile[..size];
+            let name = std::ffi::CStr::from_ptr(entry.szExeFile.as_ptr());
             for file in files {
-                if file.as_bytes().eq_ignore_ascii_case(name) {
+                if file.as_bytes().eq_ignore_ascii_case(name.to_bytes_with_nul()) {
                     let process =
                         SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
                     handles.push((process, entry.th32ProcessID));

@@ -75,6 +75,6 @@ pub async fn cleanup_timer() {
         println!("Cleaning up...");
 
         let mut data = success_rpa_mut().await;
-        data.retain(|_k, v| v.timestamp.elapsed().as_secs() < 60);        
+        data.retain(|_k, v| v.timestamp.elapsed().as_secs() < 32);        
     }
 }

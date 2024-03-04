@@ -3,7 +3,7 @@ use windows::Win32::{Foundation::*, Security::*, System::Threading::*};
 
 pub fn enable_debug_priv() -> windows::core::Result<()> {
     unsafe {
-        let mut token = crate::handles::SafeHandle::<false>(HANDLE::default());
+        let mut token = crate::handles::SafeHandle::<true>(HANDLE::default());
         let mut luid = LUID::default();
         
         OpenProcessToken(
@@ -30,6 +30,9 @@ pub fn enable_debug_priv() -> windows::core::Result<()> {
             None,
             None,
         )?;
+
+        #[cfg(debug_assertions)]
+        println!("[!] Token {:?} SE_PRIVILEGE_ENABLED", *token);
 
         Ok(())
     }

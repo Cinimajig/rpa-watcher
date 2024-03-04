@@ -1,5 +1,5 @@
 [package]
-name = "client"
+name = "rpa-watcher"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,7 +11,7 @@ ureq = { version = "2.9.1", features = ["json", "charset"] }
 serde = "1.0.193"
 serde_json = "1.0.108"
 rpa = { path = "../rpa-lib" }
-windows = { version = "0.52.0", features = [
+windows = { version = "0.54.0", features = [
     "Win32_Foundation",
     "Win32_System_Diagnostics_Debug",
     "Win32_System_Diagnostics_ToolHelp",
