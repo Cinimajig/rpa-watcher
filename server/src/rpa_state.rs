@@ -39,6 +39,7 @@ pub async fn success_rpa() -> RwLockReadGuard<'static, RpaItems> {
     }
 }
 
+#[allow(dead_code)]
 pub async fn rpa_f_mut() -> RwLockWriteGuard<'static, RpaItems> {
     unsafe {
         if DATA_FAILED.is_none() {
