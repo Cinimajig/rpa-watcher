@@ -17,6 +17,19 @@ It consist of two components (well, three):
 - The server. It can run on both Linux and Windows (maybe MacOS) and should be able to be used in [IIS](https://en.wikipedia.org/wiki/Internet_Information_Services). This you can implement youself if you want.
 - the website (wwwroot). This is not a required component of the server module, but you might need the folder to exist for it to work. Feel free to implement this site yourself if you want.
 
+## Supported platforms
+- `InstanceID` == The unique ID of the running instance.
+- `InstanceName` == The human readable name of the running process.
+- `ClickableLink` == Contains a clickable link on the website.
+- `AzureData` == Contains data related to Microsoft Azure.
+
+| Platform       | Implemented | InstanceID | InstanceName | ClickableLink | AzureData |
+| -------------- | ----------- | ---------- | ------------ | ------------- | --------- |
+| ProcessRobot   | Yes         | Yes        | Planned      | No            | No        |
+| Power Automate | Yes         | Yes        | Planned      | Yes           | Yes       |
+| UIPath         | Not yet     | No         | No           | No            | Maybe?    |
+| More to come   | Not yet     |            |              |               |           |
+
 ## Building from source
 > [!NOTE]
 > It's recommended you build the client on Microsoft Windows. The server can be build on Linux and Windows.
