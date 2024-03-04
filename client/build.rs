@@ -1,5 +1,5 @@
+use std::{env, fs, path::PathBuf};
 use windows_exe_info as wi;
-use std::{path::PathBuf, fs, env};
 
 /// A macro for creating a [`Path`], but for lazy people.
 macro_rules! p {
@@ -8,22 +8,20 @@ macro_rules! p {
     };
     (buf $p:expr) => {
         ::std::path::PathBuf::from($p)
-    } 
+    };
 }
 
 /// Macro for repeating x amount of times.
 macro_rules! r {
     ($l:literal, $p:expr) => {
-       for _ in 0..$l { $p; }
-    } 
+        for _ in 0..$l {
+            $p;
+        }
+    };
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=settings.ini");
-    
-    if cfg!(not(windows)) {
-        panic!("this application is Windows exclusive");
-    }
 
     let target_dir = {
         let mut out = env::var("OUT_DIR").map(PathBuf::from)?;
@@ -34,14 +32,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut settings_path = target_dir;
     settings_path.push("example_settings.ini");
 
-    fs::copy(
-        "settings.ini",
-        settings_path
-    )?;
+    fs::copy("settings.ini", settings_path)?;
 
-    wi::manifest(p!("assets/manifest.xml"));
-    wi::icon::icon_ico(p!("../assets/rpa-watcher.ico"));
-    wi::versioninfo::VersionInfo::from_cargo_env().link()?;
+    #[cfg(windows)]
+    {
+        wi::manifest(p!("assets/manifest.xml"));
+        wi::icon::icon_ico(p!("../assets/rpa-watcher.ico"));
+        wi::versioninfo::VersionInfo::from_cargo_env().link()?;
+    }
 
     Ok(())
 }

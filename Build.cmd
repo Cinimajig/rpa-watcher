@@ -14,7 +14,7 @@ Robocopy wwwroot            target\dist\server\wwwroot  /MIR
 Robocopy target\release     target\dist\client          *.exe *.ini /XF *srv*.exe /PURGE
 
 :: ZIPPING FILES.
-powershell -Command Compress-Archive target\dist\* target\rpa-watcher.zip
+powershell -Command Compress-Archive target\dist\* target\RPA.Watcher.zip
 
 :: DONE!
 ECHO Build ran with success. Files are located in the "dist" folder.
