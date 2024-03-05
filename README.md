@@ -27,7 +27,7 @@ It consist of two components (well, three):
 | -------------- | ----------- | ---------- | ------------ | ------------- | --------- |
 | [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | Planned | No | No |
 | [Power Automate Desktop](https://powerautomate.microsoft.com) | Yes | Yes | Planned | Yes | Yes |
-| [UIPath](https://uipath.com) | Not yet | No | No | No | Maybe? |
+| [UIPath](https://uipath.com) | Not yet |  |  |  |  |
 | More to come | Not yet |  |  |  |  |
 
 ## Building from source

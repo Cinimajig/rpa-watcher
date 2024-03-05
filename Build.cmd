@@ -14,6 +14,7 @@ Robocopy wwwroot            target\dist\server\wwwroot  /MIR
 Robocopy target\release     target\dist\client          *.exe *.ini /XF *srv*.exe /PURGE
 
 :: ZIPPING FILES.
+DEL /F /Q target\RPA.Watcher.zip
 powershell -Command Compress-Archive target\dist\* target\RPA.Watcher.zip -Force
 
 :: DONE!
