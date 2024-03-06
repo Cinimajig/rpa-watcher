@@ -22,7 +22,8 @@ pub fn router() -> Router {
         .fallback(crate::fallback)
 }
 
-async fn get_failed_rpadata(// headers: HeaderMap,
+async fn get_failed_rpadata(
+    // headers: HeaderMap,
     // State(state): State<RpaState>,
 ) -> Json<Vec<RpaData>> {
     let data = rpa_failed().await;

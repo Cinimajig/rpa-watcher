@@ -11,7 +11,7 @@ use windows::{
     },
 };
 
-/// Get's the commandline of the process handle. 
+/// Get's the commandline of the process handle.
 /// If the handle is invalid, the function will fail.
 pub fn get_cmdline(process: HANDLE) -> windows::core::Result<String> {
     unsafe {
@@ -62,15 +62,14 @@ pub fn get_cmdline(process: HANDLE) -> windows::core::Result<String> {
     }
 }
 
-/// Finds the given process names and returns a handle to it. 
-/// The handle is wrapped in a [`SafeHandle`] that automatically 
+/// Finds the given process names and returns a handle to it.
+/// The handle is wrapped in a [`SafeHandle`] that automatically
 /// closes it when dropped.
 pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, u32)>> {
     let mut handles: Vec<(SafeHandle, u32)> = Vec::with_capacity(10);
 
     unsafe {
-        // Using the ASCII version, because of `activeCodePage` in the app-manifest.
-        // Meaning ASCII == UTF-8.
+        // Using the ASCII version, because we don't need Unicode support right here.
         let mut entry = PROCESSENTRY32 {
             dwSize: mem::size_of::<PROCESSENTRY32>() as _,
             ..Default::default()
@@ -78,7 +77,6 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
         let snapshot = SafeHandle::<true>(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)?);
 
         // First process is always PID 0 or 4 (System Processes). it's needed for Process32Next.
-        // Not using Wide-functions, since the manifest forces UTF-8.
         Process32First(*snapshot, &mut entry)?;
 
         // Iterate over all other processes.
@@ -86,10 +84,10 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
             // let size = (0usize..).take_while(|i| entry.szExeFile[*i] != 0).count();
             // let name = &entry.szExeFile[..size];
             let name = std::ffi::CStr::from_ptr(entry.szExeFile.as_ptr());
+
             for file in files {
-                if file.as_bytes().eq_ignore_ascii_case(name.to_bytes_with_nul()) {
-                    let process =
-                        SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
+                if file.as_bytes().eq_ignore_ascii_case(name.to_bytes()) {
+                    let process = SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
                     handles.push((process, entry.th32ProcessID));
                     break;
                 }

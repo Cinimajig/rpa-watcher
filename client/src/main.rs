@@ -17,6 +17,7 @@ const RPA_PROCESSES: &[&str] = &[
 
 fn main() -> io::Result<Infallible> {
     let env = env::Environment::from_file_then_env();
+    dbg_output(format!("<RPA.Watcher> {env:?}"));
 
     // Enable debug privilages.
     privilage::enable_debug_priv()?;
@@ -34,6 +35,7 @@ fn main() -> io::Result<Infallible> {
             // Get a handle and pid to all relevant processes.
             let processes = process::find_processes(RPA_PROCESSES)?;
             if processes.is_empty() {
+                dbg_output("<RPA.Watcher> No process(es) was found.");
                 break 'process_lookup SLEEP_SECONDS_SHORT;
             }
 

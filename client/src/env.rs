@@ -5,6 +5,7 @@ use std::{io, env, fs};
 const DEFAULT_URL: &str = "http://localhost/api/checkin";
 const DEFAULT_TOKEN: &str = "";
 
+#[derive(Debug)]
 pub struct Environment {
     pub url: String,
     pub token: String,
