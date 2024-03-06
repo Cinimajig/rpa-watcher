@@ -20,7 +20,7 @@ pub fn get_cmdline(process: HANDLE) -> windows::core::Result<String> {
         NtQueryInformationProcess(
             process,
             ProcessBasicInformation,
-            mem::transmute(&mut pbi),
+            &mut pbi as *mut _ as _,
             mem::size_of::<PROCESS_BASIC_INFORMATION>() as _,
             std::ptr::null_mut(),
         )
@@ -31,7 +31,7 @@ pub fn get_cmdline(process: HANDLE) -> windows::core::Result<String> {
         ReadProcessMemory(
             process,
             pbi.PebBaseAddress as _,
-            mem::transmute(&mut peb),
+            &mut peb as *mut _ as _,
             mem::size_of::<PEB>() as _,
             None,
         )?;
@@ -41,7 +41,7 @@ pub fn get_cmdline(process: HANDLE) -> windows::core::Result<String> {
         ReadProcessMemory(
             process,
             peb.ProcessParameters as _,
-            mem::transmute(&mut process_parameters),
+            &mut process_parameters as *mut _ as _,
             mem::size_of::<RTL_USER_PROCESS_PARAMETERS>(),
             None,
         )?;
