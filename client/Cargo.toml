@@ -7,9 +7,9 @@ edition = "2021"
 
 [dependencies]
 # curl = "0.4.44"
-ureq = { version = "2.9.1", features = ["json", "charset"] }
-serde = "1.0.193"
-serde_json = "1.0.108"
+ureq = { version = "2.9.6", features = ["json", "charset"] }
+serde = "1.0.197"
+serde_json = "1.0.114"
 rpa = { path = "../rpa-lib" }
 windows = { version = "0.54.0", features = [
     "Win32_Foundation",
@@ -23,7 +23,7 @@ windows = { version = "0.54.0", features = [
 ] }
 
 [target.'cfg(windows)'.build-dependencies]
-windows_exe_info = { version = "0.4.1", features = [
+windows_exe_info = { version = "0.4.2", features = [
     "embed_resource",
     "manifest",
 ] }
