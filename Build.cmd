@@ -4,17 +4,21 @@
 cargo build --release
 IF %ERRORLEVEL% NEQ 0 GOTO RETURN_LAST_ERROR
 
-MD target\dist
+RD /Q /S target\dist > NUL
+MD target\dist > NUL
 
 :: COPYING SERVER FILES.
 Robocopy target\release     target\dist\server          *srv*.exe /PURGE
 Robocopy wwwroot            target\dist\server\wwwroot  /MIR
+:: :: ICON FILES.
+COPY /Y assets\rpa-watcher.ico target\dist\server\wwwroot\favicon.ico
+COPY /Y assets\rpa-watcher.ico target\dist\server\wwwroot\view\favicon.ico
 
 :: COPYING CLIENT FILES.
 Robocopy target\release     target\dist\client          *.exe *.ini /XF *srv*.exe /PURGE
 
 :: ZIPPING FILES.
-DEL /F /Q target\RPA.Watcher.zip
+DEL /F /Q target\RPA.Watcher.zip > NUL
 powershell -Command Compress-Archive target\dist\* target\RPA.Watcher.zip -Force
 
 :: DONE!
