@@ -33,6 +33,8 @@ It consist of two components (well, three):
 ## Todo list (for now)
 - [ ] Add child flow support (client/server).
 - [ ] Add child flow support (website).
+- [ ] Add database connection for ProcessRobot (server. Low priority).
+- [ ] Add api lookup with flow names for Power Automate (server).
 
 ## Building from source
 > [!NOTE]
