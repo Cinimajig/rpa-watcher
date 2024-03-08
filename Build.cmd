@@ -1,4 +1,5 @@
 @ECHO OFF
+SETLOCAL EnableDelayedExpansion
 
 :: BUILDING CLIENT AND SERVER.
 cargo build --release
@@ -18,8 +19,10 @@ COPY /Y assets\rpa-watcher.ico target\dist\server\wwwroot\view\favicon.ico
 Robocopy target\release     target\dist\client          *.exe *.ini /XF *srv*.exe /PURGE
 
 :: ZIPPING FILES.
-DEL /F /Q target\RPA.Watcher.zip > NUL
-powershell -Command Compress-Archive target\dist\* target\RPA.Watcher.zip -Force
+SET /P VERSION=Set a version number (ie: 1.2.3):
+
+DEL /F /Q target\RPA.Watcher*.zip > NUL
+powershell -Command Compress-Archive target\dist\* target\RPA.Watcher-v%VERSION%-Win32.zip -Force
 
 :: DONE!
 ECHO Build ran with success. Files are located in the "dist" folder.
