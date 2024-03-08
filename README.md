@@ -30,6 +30,10 @@ It consist of two components (well, three):
 | [UIPath](https://uipath.com) | Not yet |  |  |  |  |
 | More to come | Not yet |  |  |  |  |
 
+## Todo list (for now)
+- [ ] Add child flow support (client/server).
+- [ ] Add child flow support (website).
+
 ## Building from source
 > [!NOTE]
 > It's recommended you build the client on Microsoft Windows. The server can be build on Linux and Windows.
