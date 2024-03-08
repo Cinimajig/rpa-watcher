@@ -65,8 +65,8 @@ pub fn get_cmdline(process: HANDLE) -> windows::core::Result<String> {
 /// Finds the given process names and returns a handle to it.
 /// The handle is wrapped in a [`SafeHandle`] that automatically
 /// closes it when dropped.
-pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, u32)>> {
-    let mut handles: Vec<(SafeHandle, u32)> = Vec::with_capacity(10);
+pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> {
+    let mut handles: Vec<SafeHandle> = Vec::with_capacity(10);
 
     unsafe {
         // Using the ASCII version, because we don't need Unicode support right here.
@@ -88,7 +88,7 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<(SafeHandle, 
             for file in files {
                 if file.as_bytes().eq_ignore_ascii_case(name.to_bytes()) {
                     let process = SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
-                    handles.push((process, entry.th32ProcessID));
+                    handles.push(process);
                     break;
                 }
             }

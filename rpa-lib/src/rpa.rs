@@ -53,7 +53,6 @@ impl fmt::Display for RpaEngine {
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Default))]
 pub struct RpaData {
-    pub pid: u32,
     pub engine: RpaEngine,
     pub computer: String,
     pub env: Option<String>,
@@ -62,7 +61,7 @@ pub struct RpaData {
 }
 
 impl RpaData {
-    pub fn from_cmdline(pid: u32, args: &str, hostname: &str) -> io::Result<Self> {
+    pub fn from_cmdline(args: &str, hostname: &str) -> io::Result<Self> {
         let args = args.to_ascii_lowercase();
 
         // Find the process.
@@ -157,7 +156,6 @@ impl RpaData {
             None => None,
         };
         Ok(RpaData {
-            pid,
             engine,
             computer: hostname.to_string(),
             env,
@@ -204,17 +202,15 @@ mod tests {
 
     #[test]
     fn parse() {
-        let pid: u32 = 1234;
         // Auto generated GUIDs.
         let cmdline = r#""C:\Program Files (x86)\Power Automate Desktop\PAD.Robot.exe" --runId 9e0fc63338dd46e3b86fac1eceada33b --flowId 0d7d85e0c9744bd08bec545ef5d103af  --mode Run --trigger PadConsole --userpc --category PadConsole --correlationid "b367466d-4e80-44f8-b4b6-b0467d1d25a2" --environment "tip0" --environmentname "f7e54624-c28a-49f2-9da9-6f98ae509947" --geo "europe" --principaloid "e1b12f5e-d046-4679-ae35-c785a9d7766a" --principalpuid "1111111111111111" --region "westeurope" --sessionid "a24f7725-012c-4b3f-b55c-8ec8c1f92f1a" --tenantid "6d74b3cf-0246-4210-8b17-2042b0440806""#;
 
-        RpaData::from_cmdline(pid, cmdline, "localhost").unwrap();
+        RpaData::from_cmdline(cmdline, "localhost").unwrap();
     }
 
     #[test]
     fn to_and_from_json() {
         let data = RpaData {
-            pid: 1234,
             engine: RpaEngine::PowerAutomate,
             computer: "hostname".to_string(),
             env: Some("rand-env".to_string()),

@@ -40,12 +40,12 @@ fn main() -> io::Result<Infallible> {
             }
 
             // Get's the commandline for each and constructs an RpaData structure.
-            for (process, pid) in processes {
+            for process in processes {
                 let Ok(cmdline) = process::get_cmdline(*process) else {
                     continue;
                 };
 
-                let Ok(rpa_data) = RpaData::from_cmdline(pid, &cmdline, &comp_name) else {
+                let Ok(rpa_data) = RpaData::from_cmdline(&cmdline, &comp_name) else {
                     continue;
                 };
 
