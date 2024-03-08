@@ -48,6 +48,15 @@ impl fmt::Display for RpaEngine {
     }
 }
 
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[serde(rename_all = "PascalCase")]
+#[cfg_attr(test, derive(Default))]
+pub enum RpaTrigger {
+    #[cfg_attr(test, default)]
+    Attended,
+    Unattended,
+}
+
 /// Collection of relevant data for the client to watch and send to the server.
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -55,9 +64,10 @@ impl fmt::Display for RpaEngine {
 pub struct RpaData {
     pub engine: RpaEngine,
     pub computer: String,
-    pub env: Option<String>,
     pub instance: String,
-    pub azure_data: Option<AzureData>,
+    pub trigger: Option<RpaTrigger>,
+    pub flow_id: Option<String>,
+    pub parent_instance: Option<String>,
 }
 
 impl RpaData {
@@ -116,13 +126,13 @@ impl RpaData {
             }
         };
 
-        let env = match engine {
-            RpaEngine::PowerAutomate => {
-                find_parameter(&args, "--environmentname \"", GUID_LENGTH).map(|s| s.to_string())
-            }
-            // TODO! decode --serverBaseUriB64?
-            RpaEngine::ProcessRobot => None,
-        };
+        // let env = match engine {
+        //     RpaEngine::PowerAutomate => {
+        //         find_parameter(&args, "--environmentname \"", GUID_LENGTH).map(|s| s.to_string())
+        //     }
+        //     // TODO! decode --serverBaseUriB64?
+        //     RpaEngine::ProcessRobot => None,
+        // };
 
         let flow_id = match engine {
             RpaEngine::PowerAutomate => find_parameter(&args, "--flowid ", SMALL_GUID_LENGTH).map(|s| format!(
@@ -136,41 +146,53 @@ impl RpaData {
             RpaEngine::ProcessRobot => None,
         };
 
-        let tenant_id = match engine {
-            RpaEngine::PowerAutomate => find_parameter(&args, "--tenantid \"", GUID_LENGTH),
-            // TODO! decode --serverBaseUriB64?
+        let trigger = match engine {
+            RpaEngine::ProcessRobot => None,
+            RpaEngine::PowerAutomate if args.contains("--trigger Cloud") => Some(RpaTrigger::Unattended),
+            RpaEngine::PowerAutomate => Some(RpaTrigger::Attended),
+        };
+
+        let parent_instance = match engine {
+            RpaEngine::PowerAutomate => find_parameter(&args, "--rootFlowId ", SMALL_GUID_LENGTH).map(|s| format!(
+                        "{}-{}-{}-{}-{}",
+                        &s[..8],
+                        &s[8..12],
+                        &s[12..16],
+                        &s[16..20],
+                        &s[20..]
+                    )),
             RpaEngine::ProcessRobot => None,
         };
 
-        let azure_data = match (flow_id, tenant_id) {
-            (Some(f), Some(t)) => Some(AzureData {
-                flow_id: f,
-                tenant_id: t.to_string(),
-            }),
-            _ => None,
-        };
+        // let tenant_id = match engine {
+        //     RpaEngine::PowerAutomate => find_parameter(&args, "--tenantid \"", GUID_LENGTH),
+        //     // TODO! decode --serverBaseUriB64?
+        //     RpaEngine::ProcessRobot => None,
+        // };
 
-        let env = match env {
-            Some(e) if e.contains("one-drive") => None,
-            Some(e) => Some(e),
-            None => None,
-        };
+        // let azure_data = match (flow_id, tenant_id) {
+        //     (Some(f), Some(t)) => Some(AzureData {
+        //         flow_id: f,
+        //         tenant_id: t.to_string(),
+        //     }),
+        //     _ => None,
+        // };
+
+        // let env = match env {
+        //     Some(e) if e.contains("one-drive") => None,
+        //     Some(e) => Some(e),
+        //     None => None,
+        // };
         Ok(RpaData {
             engine,
             computer: hostname.to_string(),
-            env,
             instance: run_id,
-            azure_data,
+            flow_id,
+            parent_instance,
+            trigger,
+            // azure_data,
         })
     }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-#[derive(Default, Debug)]
-pub struct AzureData {
-    pub flow_id: String,
-    pub tenant_id: String,
 }
 
 fn find_parameter<'a>(cmdline_lc: &'a str, param: &'a str, length: usize) -> Option<&'a str> {
@@ -213,9 +235,10 @@ mod tests {
         let data = RpaData {
             engine: RpaEngine::PowerAutomate,
             computer: "hostname".to_string(),
-            env: Some("rand-env".to_string()),
             instance: "rand-inst".to_string(),
-            azure_data: None,
+            flow_id: Some("some-flow".to_string()),
+            parent_instance: None,
+            trigger: Some(RpaTrigger::default()),
         };
 
         let json = serde_json::to_string_pretty(&data);
