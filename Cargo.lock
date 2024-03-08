@@ -604,7 +604,7 @@ dependencies = [
 
 [[package]]
 name = "rpa"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -612,7 +612,7 @@ dependencies = [
 
 [[package]]
 name = "rpa-watcher"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "rpa",
  "serde",
@@ -624,7 +624,7 @@ dependencies = [
 
 [[package]]
 name = "rpa-watcher-srv"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "axum",
  "rpa",
