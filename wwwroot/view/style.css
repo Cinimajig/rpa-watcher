@@ -50,7 +50,7 @@ main {
     display: table-cell;
     text-overflow: ellipsis;
     overflow: hidden !important;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 
 .tbody .tr:last-of-type {

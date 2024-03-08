@@ -35,11 +35,10 @@ const buildRpaConvas = async (clear) => {
         tr.setAttribute('data-ref', rpa[0]);
         const engine = tr.querySelector('.td.engine');
         const hostname = tr.querySelector('.td.hostname');
-        const env = tr.querySelector('.td.env');
+        const trigger = tr.querySelector('.td.trigger');
         const instance = tr.querySelector('.td.instance');
         const flowId = tr.querySelector('.td.name');
-        const teanantId = tr.querySelector('.td.extra');
-
+        const parent = tr.querySelector('.td.parentInstance');
 
         switch (rpa[1].engine) {
             case 'Power Automate':
@@ -52,16 +51,20 @@ const buildRpaConvas = async (clear) => {
 
         engine.innerText = rpa[1].engine.trim();
         hostname.innerText = rpa[1].computer.trim();
-        env.innerText = rpa[1].env ? rpa[1].env : 'null...';
+        trigger.innerText = rpa[1].trigger ? rpa[1].trigger.trim() : '';
         instance.innerText = rpa[1].instance.trim();
+        flowId.innerText = rpa[1].flowId ? rpa[1].flowId.trim() : '';
 
-        if (rpa[1]?.azureData) {
-            flowId.innerText = rpa[1].azureData.flowId.trim();
-            teanantId.innerText = rpa[1].azureData.tenantId.trim();
-
-            if (engine.classList.contains('pad') && rpa[1].env) {
-                instance.innerHTML = `<a target="_blank" href="https://make.powerautomate.com/environments/${env.innerText}/uiflows/${flowId.innerText}/runs/${instance.innerText}">${instance.innerText}</a>`;
+        if (rpa[1].parentInstance) {
+            parent.innerText = rpa[1].parentInstance.trim();
+            parentElement = document.querySelector(`.tr.rpa-info[data-ref="${rpa[1].parentInstance}"`);
+            
+            if (parentElement && parentElement.nextSibling) {
+                engine.innerText = '';
+                rpaView.insertBefore(tr, parentElement.nextSibling);
             }
+            
+            continue;
         }
 
         rpaView.appendChild(tr);

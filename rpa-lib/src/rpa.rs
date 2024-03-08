@@ -48,6 +48,7 @@ impl fmt::Display for RpaEngine {
     }
 }
 
+/// Trigger types for an RPA-process broken down to the most relevant ones.
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
 #[cfg_attr(test, derive(Default))]
