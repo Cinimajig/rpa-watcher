@@ -149,7 +149,7 @@ impl RpaData {
 
         let trigger = match engine {
             RpaEngine::ProcessRobot => None,
-            RpaEngine::PowerAutomate if args.contains("--trigger Cloud") => Some(RpaTrigger::Unattended),
+            RpaEngine::PowerAutomate if args.contains("--trigger cloud") => Some(RpaTrigger::Unattended),
             RpaEngine::PowerAutomate => Some(RpaTrigger::Attended),
         };
 
