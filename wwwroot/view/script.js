@@ -1,4 +1,4 @@
-const timeoutSeconds = 5;
+const intervalSeconds = 5;
 const rpaView = document.querySelector('#rpa-view');
 const info = document.querySelector('.no-info');
 
@@ -23,7 +23,7 @@ const buildRpaConvas = async (clear) => {
         }
     }
 
-    for (let rpa of rpaData.entries()) {
+    for (let rpa of [...rpaData.entries()].sort((a, b) => a[1].parentInstance !== null)) {
         info.style.display = '';
         if (document.querySelector(`.tr.rpa-info[data-ref="${rpa[0]}"`)) {
             continue;
@@ -38,7 +38,7 @@ const buildRpaConvas = async (clear) => {
         const trigger = tr.querySelector('.td.trigger');
         const instance = tr.querySelector('.td.instance');
         const flowId = tr.querySelector('.td.name');
-        const parent = tr.querySelector('.td.parentInstance');
+        const parent = tr.querySelector('.td.parent');
 
         switch (rpa[1].engine) {
             case 'Power Automate':
@@ -56,15 +56,15 @@ const buildRpaConvas = async (clear) => {
         flowId.innerText = rpa[1].flowId ? rpa[1].flowId.trim() : '';
 
         if (rpa[1].parentInstance) {
-            parent.innerText = rpa[1].parentInstance.trim();
-            parentElement = document.querySelector(`.tr.rpa-info[data-ref="${rpa[1].parentInstance}"`);
-            
+            parent.innerText = rpa[1].parentInstance?.trim();
+            let parentElement = document.querySelector(`.tr.rpa-info[data-ref="${rpa[1].parentInstance}"`);
+            console.log(parentElement)
+
             if (parentElement && parentElement.nextSibling) {
                 engine.innerText = '';
                 rpaView.insertBefore(tr, parentElement.nextSibling);
+                continue;
             }
-            
-            continue;
         }
 
         rpaView.appendChild(tr);
@@ -102,7 +102,7 @@ const timer = setInterval(() => {
         clearCanvas();
         console.error(err);
     })
-}, timeoutSeconds * 1000);
+}, intervalSeconds * 1000);
 buildRpaConvas();
 
 globalThis.clearTimer = (really) => {
@@ -113,16 +113,25 @@ globalThis.clearTimer = (really) => {
 
 globalThis.insertTestData = (times) => {
     for (let i = 0; i < times; i++) {
-        rpaData.set('b415296d-aea8-48d9-aea9-053d77450f2b' + i, {
-            engine: 'Power Automate',
-            computer: 'TESTMACHINE',
-            env: 'b415296d-aea8-48d9-aea9-053d77450f2b',
-            instance: 'b415296d-aea8-48d9-aea9-053d77450f2b',
-            azureData: {
+        if (i === 0) {
+            rpaData.set('b415296d-aea8-48d9-aea9-053d77450f2b' + i, {
+                engine: 'Power Automate',
+                computer: 'TESTMACHINE',
+                trigger: 'Unattended',
+                instance: 'b415296d-aea8-48d9-aea9-053d77450f2b',
                 flowId: 'b415296d-aea8-48d9-aea9-053d77450f2b',
-                tenantId: 'b415296d-aea8-48d9-aea9-053d77450f2b'
-            }
-        });
+                parentInstance: null
+            });
+        } else {
+            rpaData.set('b415296d-aea8-48d9-aea9-053d77450f2c' + i, {
+                engine: 'Power Automate',
+                computer: 'TESTMACHINE',
+                trigger: 'Unattended',
+                instance: 'b415296d-aea8-48d9-aea9-053d77450f2c',
+                flowId: 'b415296d-aea8-48d9-aea9-053d77450f2c',
+                parentInstance: 'b415296d-aea8-48d9-aea9-053d77450f2b'
+            });
+        }
     }
 
     buildRpaConvas(false);

@@ -154,7 +154,7 @@ impl RpaData {
         };
 
         let parent_instance = match engine {
-            RpaEngine::PowerAutomate => find_parameter(&args, "--rootflowid ", SMALL_GUID_LENGTH).map(|s| format!(
+            RpaEngine::PowerAutomate => find_parameter(&args, "--rootRunId ", SMALL_GUID_LENGTH).map(|s| format!(
                         "{}-{}-{}-{}-{}",
                         &s[..8],
                         &s[8..12],
