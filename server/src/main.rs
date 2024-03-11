@@ -18,6 +18,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => DEFAULT_PORT,
     };
 
+    #[cfg(debug_assertions)]
+    for (name, val) in env::vars() {
+        println!("{name}={val}");
+    }
+
     let app = Router::new()
         .nest_service(
             "/",
