@@ -87,7 +87,8 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> 
 
             for file in files {
                 if file.as_bytes().eq_ignore_ascii_case(name.to_bytes()) {
-                    let process = SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
+                    let process =
+                        SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
                     handles.push(process);
                     break;
                 }

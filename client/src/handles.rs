@@ -4,10 +4,10 @@ use windows::Win32::Foundation::*;
 pub const DEBUG_MODE: bool = cfg!(debug_assertions);
 
 /// A Wrapper type, that captures a `HANDLE` and then calls `CloseHandle` when dropped.
-/// 
+///
 /// If the handle shouldn't call `CloseHandle`, then don't use this struct.
 #[repr(transparent)]
-pub struct SafeHandle<const SUPRESS: bool = {!DEBUG_MODE}>(pub HANDLE);
+pub struct SafeHandle<const SUPRESS: bool = { !DEBUG_MODE }>(pub HANDLE);
 
 impl<const SUPRESS: bool> Drop for SafeHandle<SUPRESS> {
     fn drop(&mut self) {

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::{io, env, fs};
+use std::{env, fs, io};
 
 const DEFAULT_URL: &str = "http://localhost/api/checkin";
 const DEFAULT_TOKEN: &str = "";
@@ -25,15 +25,21 @@ impl Environment {
         let mut this = Self::from_file().unwrap_or_default();
 
         match (env::var("RW_URL"), env::var("RW_TOKEN")) {
-            (Ok(url), Ok(token)) => { this.url = url; this.token = token; },
-            (Ok(url), Err(_)) => { this.url = url; },
-            (Err(_), Ok(token)) => { this.token = token; },
+            (Ok(url), Ok(token)) => {
+                this.url = url;
+                this.token = token;
+            }
+            (Ok(url), Err(_)) => {
+                this.url = url;
+            }
+            (Err(_), Ok(token)) => {
+                this.token = token;
+            }
             (Err(_), Err(_)) => (),
         }
 
         this
     }
-
 
     pub fn from_env() -> Result<Self, env::VarError> {
         let url = env::var("RW_URL")?;
@@ -61,10 +67,18 @@ impl Environment {
 
             // Finds the variables we care about.
             match line.split_once('=') {
-                Some((s, v)) if s.trim().eq_ignore_ascii_case("URL") => this.url = v.trim().to_string(),
-                Some((s, _)) if s.trim().eq_ignore_ascii_case("URL") => this.url = DEFAULT_URL.to_string(),
-                Some((s, v)) if s.trim().eq_ignore_ascii_case("TOKEN") => this.token = v.trim().to_string(),
-                Some((s, _)) if s.trim().eq_ignore_ascii_case("TOKEN") => this.token = DEFAULT_TOKEN.to_string(),
+                Some((s, v)) if s.trim().eq_ignore_ascii_case("URL") => {
+                    this.url = v.trim().to_string()
+                }
+                Some((s, _)) if s.trim().eq_ignore_ascii_case("URL") => {
+                    this.url = DEFAULT_URL.to_string()
+                }
+                Some((s, v)) if s.trim().eq_ignore_ascii_case("TOKEN") => {
+                    this.token = v.trim().to_string()
+                }
+                Some((s, _)) if s.trim().eq_ignore_ascii_case("TOKEN") => {
+                    this.token = DEFAULT_TOKEN.to_string()
+                }
                 _ => (),
             };
         }

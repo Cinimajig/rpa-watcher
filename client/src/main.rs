@@ -1,17 +1,17 @@
+mod dbg;
+mod env;
 mod handles;
+mod http;
 mod privilage;
 mod process;
-mod http;
-mod env;
-mod dbg;
 
-use std::{convert::Infallible, thread, time, io};
-use rpa::*;
-use windows::core::*;
 use dbg::*;
+use rpa::*;
+use std::{convert::Infallible, io, thread, time};
+use windows::core::*;
 
 const RPA_PROCESSES: &[&str] = &[
-    RpaEngine::PowerAutomate.process_name(), 
+    RpaEngine::PowerAutomate.process_name(),
     RpaEngine::ProcessRobot.process_name(),
 ];
 

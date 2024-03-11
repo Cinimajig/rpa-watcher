@@ -6,7 +6,11 @@ pub fn dbg_output(text: impl fmt::Display) {
     println!("{text}");
 
     unsafe {
-        let dbg: Box<[u16]> = text.to_string().encode_utf16().chain(iter::once(0)).collect();
+        let dbg: Box<[u16]> = text
+            .to_string()
+            .encode_utf16()
+            .chain(iter::once(0))
+            .collect();
         OutputDebugStringW(PCWSTR::from_raw(dbg.as_ptr()));
     }
 }

@@ -22,16 +22,14 @@ pub fn router() -> Router {
         .fallback(crate::fallback)
 }
 
-async fn get_failed_rpadata(
-    // headers: HeaderMap,
+async fn get_failed_rpadata(// headers: HeaderMap,
     // State(state): State<RpaState>,
 ) -> Json<Vec<RpaData>> {
     let data = rpa_failed().await;
     Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
 }
 
-async fn get_rpadata(
-    // headers: HeaderMap,
+async fn get_rpadata(// headers: HeaderMap,
     // State(state): State<RpaState>,
 ) -> Json<Vec<RpaData>> {
     let data = success_rpa().await;
@@ -71,11 +69,11 @@ pub async fn cleanup_timer() {
 
     loop {
         sleep(Duration::from_secs(CLEANUP_TIMER_INTERVAL)).await;
-        
+
         #[cfg(debug_assertions)]
         println!("Cleaning up...");
 
         let mut data = success_rpa_mut().await;
-        data.retain(|_k, v| v.timestamp.elapsed().as_secs() < 32);        
+        data.retain(|_k, v| v.timestamp.elapsed().as_secs() < 32);
     }
 }

@@ -1,12 +1,12 @@
 mod api;
 mod rpa_state;
 
-use std::env;
 use axum::{
     handler::HandlerWithoutStateExt,
     http::{StatusCode, Uri},
     Router,
 };
+use std::env;
 use tower_http::services::ServeDir;
 
 const DEFAULT_PORT: u16 = 80;

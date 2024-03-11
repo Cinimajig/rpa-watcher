@@ -136,32 +136,41 @@ impl RpaData {
         // };
 
         let flow_id = match engine {
-            RpaEngine::PowerAutomate => find_parameter(&args, "--flowid ", SMALL_GUID_LENGTH).map(|s| format!(
+            RpaEngine::PowerAutomate => {
+                find_parameter(&args, "--flowid ", SMALL_GUID_LENGTH).map(|s| {
+                    format!(
                         "{}-{}-{}-{}-{}",
                         &s[..8],
                         &s[8..12],
                         &s[12..16],
                         &s[16..20],
                         &s[20..]
-                    )),
+                    )
+                })
+            }
             RpaEngine::ProcessRobot => None,
         };
 
         let trigger = match engine {
             RpaEngine::ProcessRobot => None,
-            RpaEngine::PowerAutomate if args.contains("--trigger cloud") => Some(RpaTrigger::Unattended),
+            RpaEngine::PowerAutomate if args.contains("--trigger cloud") => {
+                Some(RpaTrigger::Unattended)
+            }
             RpaEngine::PowerAutomate => Some(RpaTrigger::Attended),
         };
 
         let parent_instance = match engine {
-            RpaEngine::PowerAutomate => find_parameter(&args, "--rootRunId ", SMALL_GUID_LENGTH).map(|s| format!(
+            RpaEngine::PowerAutomate => find_parameter(&args, "--rootRunId ", SMALL_GUID_LENGTH)
+                .map(|s| {
+                    format!(
                         "{}-{}-{}-{}-{}",
                         &s[..8],
                         &s[8..12],
                         &s[12..16],
                         &s[16..20],
                         &s[20..]
-                    )),
+                    )
+                }),
             RpaEngine::ProcessRobot => None,
         };
 

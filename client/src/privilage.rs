@@ -5,7 +5,7 @@ pub fn enable_debug_priv() -> windows::core::Result<()> {
     unsafe {
         let mut token = crate::handles::SafeHandle::<true>(HANDLE::default());
         let mut luid = LUID::default();
-        
+
         OpenProcessToken(
             GetCurrentProcess(),
             TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,

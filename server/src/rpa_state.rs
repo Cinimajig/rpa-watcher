@@ -12,9 +12,7 @@ pub struct RpaValue {
 
 impl RpaValue {
     pub fn new(timestamp: Instant, data: RpaData) -> Self {
-        Self {
-            timestamp, data,
-        }
+        Self { timestamp, data }
     }
 }
 
