@@ -20,21 +20,20 @@ It consist of two components (well, three):
 ## Supported platforms
 - `InstanceID` == The unique ID of the running instance.
 - `InstanceName` == The human readable name of the running process.
-- `ClickableLink` == Contains a clickable link on the website.
-- `AzureData` == Contains data related to Microsoft Azure.
 
-| Platform       | Implemented | InstanceID | InstanceName | ClickableLink | AzureData |
-| -------------- | ----------- | ---------- | ------------ | ------------- | --------- |
-| [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | Planned | No | No |
-| [Power Automate Desktop](https://powerautomate.microsoft.com) | Yes | Yes | Planned | Yes | Yes |
-| [UIPath](https://uipath.com) | Not yet |  |  |  |  |
-| More to come | Not yet |  |  |  |  |
+| Platform       | Implemented | InstanceID | InstanceName |
+| -------------- | ----------- | ---------- | ------------ |
+| [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | Planned |
+| [Power Automate Desktop](https://powerautomate.microsoft.com) | Yes | Yes | Planned |
+| [UIPath](https://uipath.com) | Not yet |  | |
+| More to come | Not yet |  |  |
 
 ## Todo list (for now)
-- [x] Add child flow support (client/server).
-- [x] Add child flow support (website).
-- [ ] Add database connection for ProcessRobot (server. Low priority).
+- [x] <s>Add child flow support (client/server).</s>
+- [x] <s>Add child flow support (website).</s>
+- [ ] Add database connection for ProcessRobot (server).
 - [ ] Add api lookup with flow names for Power Automate (server).
+- [ ] Add history overview (server/website).
 - [ ] Add failed overview (server/website).
 
 ## Building from source
@@ -48,3 +47,22 @@ Otherwise it's just the standard `cargo build --release`.
 ## Prerequisites for building
 - The Rust compiler (rustc and cargo).
 - (Client) Windows SDK (If your using MSVC) or MinGW with `rc.exe` (for GCC).
+
+## Internet Information Service (IIS)
+To use the server in IIS, you need the [HttpPlatformHandler](https://www.iis.net/downloads/microsoft/httpplatformhandler) installed on the server. This allows you do redirect all traffic of a site and enable https without much configuration.
+
+What you need to do, is to create `Web.config` file in the root of the hosted directory and place the server binary and the `wwwroot` folder in it.
+
+**An example of `Web.config`:**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <handlers>
+            <add name="httpPlatformHandler" path="*" verb="*" modules="httpPlatformHandler" resourceType="Unspecified" requireAccess="Script" />
+        </handlers>
+        <httpPlatform stdoutLogEnabled="true" startupTimeLimit="20" processPath="<PATH_TO_FOLDER>\rpa-watcher-srv.exe">
+        </httpPlatform>
+    </system.webServer>
+</configuration>
+```
