@@ -1,4 +1,4 @@
-const timeoutSeconds = 7;
+const timeoutSeconds = 5;
 const rpaView = document.querySelector('#rpa-view');
 const info = document.querySelector('.no-info');
 
