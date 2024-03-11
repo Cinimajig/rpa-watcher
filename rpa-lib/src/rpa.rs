@@ -159,7 +159,7 @@ impl RpaData {
             RpaEngine::PowerAutomate => Some(RpaTrigger::Attended),
         };
 
-        let data_instance = match engine {
+        let parent_instance = match engine {
             RpaEngine::PowerAutomate => find_parameter(&args, "--rootrunid ", SMALL_GUID_LENGTH)
                 .map(|s| {
                     format!(
