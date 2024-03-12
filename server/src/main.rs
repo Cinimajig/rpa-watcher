@@ -1,5 +1,6 @@
 mod api;
 mod rpa_state;
+mod config;
 
 use axum::{
     handler::HandlerWithoutStateExt,
@@ -9,14 +10,9 @@ use axum::{
 use std::env;
 use tower_http::services::ServeDir;
 
-const DEFAULT_PORT: u16 = 80;
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let port = match env::var("HTTP_PLATFORM_PORT").or(env::var("ASPNETCORE_PORT")) {
-        Ok(port) => port.parse().unwrap_or(DEFAULT_PORT),
-        _ => DEFAULT_PORT,
-    };
+    let config::Config { http_port, db_conn_str } = config::Config::load();
 
     #[cfg(debug_assertions)]
     for (name, val) in env::vars() {
@@ -30,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .nest("/api", api::router());
 
-    let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
+    let listener = tokio::net::TcpListener::bind(("0.0.0.0", http_port)).await?;
 
     let cleanup_job = tokio::spawn(api::cleanup_timer());
     axum::serve(listener, app).await?;
