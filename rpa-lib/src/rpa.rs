@@ -56,6 +56,8 @@ pub enum RpaTrigger {
     #[cfg_attr(test, default)]
     Attended,
     Unattended,
+    #[serde(untagged)]
+    Custom(String)
 }
 
 /// Collection of relevant data for the client to watch and send to the server.

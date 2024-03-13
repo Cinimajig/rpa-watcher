@@ -24,14 +24,13 @@ impl Config {
         };
         db_config.pop();
         db_config.push("db.conn");
-        
+
         if db_config.is_file() {
-            let parsed_db_config = match fs::read_to_string(db_config) {
-                Ok(db_config) => parse_db_config(&db_config),
-                Err(_) => None,
-            };
+            if let Ok(db_config) = fs::read_to_string(db_config) {
+                this.db_conn_str = parse_db_config(&db_config);
+            }
         }
-        
+
         this
     }
 }

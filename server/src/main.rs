@@ -1,6 +1,7 @@
 mod api;
-mod rpa_state;
 mod config;
+mod db;
+mod rpa_state;
 
 use axum::{
     handler::HandlerWithoutStateExt,
@@ -12,7 +13,16 @@ use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config::Config { http_port, db_conn_str } = config::Config::load();
+    let config::Config {
+        http_port,
+        db_conn_str,
+    } = config::Config::load();
+
+    if let Some(db_conn_str) = db_conn_str {
+        if let Err(err) = db::connect(&db_conn_str).await {
+            eprintln!("Error connectiong to ProcessRobot database. {err}");
+        }
+    };
 
     #[cfg(debug_assertions)]
     for (name, val) in env::vars() {

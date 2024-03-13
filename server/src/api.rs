@@ -58,7 +58,22 @@ async fn post_checkin(
     let now = Instant::now();
     let mut data = success_rpa_mut().await;
     for item in payload.into_iter() {
-        data.insert(item.instance.clone(), RpaValue::new(now, item));
+        let mut value = RpaValue::new(now, item);
+
+        // Search the PR database for a name.
+        match crate::db::ProcessRobotJob::query_instance(&value.data.instance).await {
+            Ok(pr) => {
+                value.data.flow_id = Some(pr.job_name);
+                value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
+            },
+            Err(err) => {
+                if cfg!(debug_assertions) {
+                    eprintln!("Failed to find ProcessRobot job. {err}");
+                }
+            },
+        }
+
+        data.insert(value.data.instance.clone(), value);
     }
 
     StatusCode::OK
@@ -67,13 +82,22 @@ async fn post_checkin(
 pub async fn cleanup_timer() {
     use tokio::time::*;
 
+    const TIMEOUT: u64 = 32;
+
     loop {
         sleep(Duration::from_secs(CLEANUP_TIMER_INTERVAL)).await;
 
-        #[cfg(debug_assertions)]
-        println!("Cleaning up...");
 
         let mut data = success_rpa_mut().await;
-        data.retain(|_k, v| v.timestamp.elapsed().as_secs() < 32);
+        data.retain(|k, v| {
+            let secs = v.timestamp.elapsed().as_secs();
+
+            #[cfg(debug_assertions)]
+            if secs >= TIMEOUT {
+                println!("Cleaning up {k}");
+            }
+
+            secs < TIMEOUT
+        });
     }
 }

@@ -11,6 +11,7 @@ serde = "1.0.197"
 serde_json = "1.0.114"
 rpa = { path = "../rpa-lib" }
 tokio = { version = "1.36.0", features = ["full"] }
+tokio-util = { version = "0.7.10", features = ["compat"] }
 tower-http = { version = "0.5.2", features = ["fs"] }
 sqlx = "0.7.4"
 remove = "0.1.3"
