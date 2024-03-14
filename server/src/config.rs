@@ -38,8 +38,8 @@ impl Config {
 fn parse_db_config(config: &str) -> Option<String> {
     let text = config.trim();
     if text.is_empty() {
-        Some(text.to_string())
-    } else {
         None
+    } else {
+        Some(text.to_string())
     }
 }
