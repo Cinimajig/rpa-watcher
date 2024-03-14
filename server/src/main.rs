@@ -18,10 +18,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         db_conn_str,
     } = config::Config::load();
 
-    if let Some(db_conn_str) = db_conn_str {
-        if let Err(err) = db::connect(&db_conn_str).await {
-            eprintln!("Error connectiong to ProcessRobot database. {err}");
-        }
+    let database = match db_conn_str {
+        Some(db_conn_str) => {
+            match db::create(&db_conn_str).await {
+                Ok(db) => Some(db),
+                Err(err) => {
+                    eprintln!("Error connectiong to ProcessRobot database. {err}");
+                    None
+                }
+            }
+        },
+        None => None,
     };
 
     #[cfg(debug_assertions)]
@@ -34,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "/",
             ServeDir::new("wwwroot").not_found_service(fallback.into_service()),
         )
-        .nest("/api", api::router());
+        .nest("/api", api::router(database));
 
     let listener = tokio::net::TcpListener::bind(("0.0.0.0", http_port)).await?;
 

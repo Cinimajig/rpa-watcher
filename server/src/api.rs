@@ -1,15 +1,17 @@
-use crate::rpa_state::*;
+use std::sync::Arc;
+use crate::{db, rpa_state::*};
 use axum::{
-    http::StatusCode,
-    routing::{get, post},
-    Json, Router,
+    extract::State, http::StatusCode, routing::{get, post}, Json, Router
 };
 use rpa::RpaData;
-use tokio::time::Instant;
+use tokio::{sync::RwLock, time::Instant};
+
+type MaybeDatabase = Option<Arc<RwLock<db::Database>>>;
 
 const CLEANUP_TIMER_INTERVAL: u64 = 5;
+const CLEANUP_TIMEOUT: u64 = 32;
 
-pub fn router() -> Router {
+pub fn router(database: MaybeDatabase) -> Router {
     // let buffer_data: RpaState = RpaState::new(
     //     HashMap::with_capacity(10), HashMap::with_capacity(20)
     // );
@@ -18,7 +20,7 @@ pub fn router() -> Router {
         .route("/getrpa", get(get_rpadata))
         .route("/getfailed", get(get_failed_rpadata))
         .route("/checkin", post(post_checkin))
-        // .with_state(buffer_data)
+        .with_state(database)
         .fallback(crate::fallback)
 }
 
@@ -42,7 +44,7 @@ async fn get_rpadata(// headers: HeaderMap,
 
 async fn post_checkin(
     // headers: HeaderMap,
-    // State(state): State<RpaState>,
+    State(database): State<MaybeDatabase>,
     Json(payload): Json<Vec<RpaData>>,
 ) -> StatusCode {
     #[cfg(debug_assertions)]
@@ -56,21 +58,25 @@ async fn post_checkin(
     println!("\tAdded to state");
 
     let now = Instant::now();
+
     let mut data = success_rpa_mut().await;
     for item in payload.into_iter() {
         let mut value = RpaValue::new(now, item);
 
         // Search the PR database for a name.
-        match crate::db::ProcessRobotJob::query_instance(&value.data.instance).await {
-            Ok(pr) => {
-                value.data.flow_id = Some(pr.job_name);
-                value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
-            },
-            Err(err) => {
-                if cfg!(debug_assertions) {
-                    eprintln!("Failed to find ProcessRobot job. {err}");
-                }
-            },
+        if let Some(db_client) = database.clone() {
+            let mut client = db_client.write().await;
+            match crate::db::ProcessRobotJob::query_instance(&mut client, &value.data.instance).await {
+                Ok(pr) => {
+                    value.data.flow_id = Some(pr.job_name);
+                    value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
+                },
+                Err(err) => {
+                    if cfg!(debug_assertions) {
+                        eprintln!("Failed to find ProcessRobot job. {err}");
+                    }
+                },
+            }
         }
 
         data.insert(value.data.instance.clone(), value);
@@ -82,11 +88,8 @@ async fn post_checkin(
 pub async fn cleanup_timer() {
     use tokio::time::*;
 
-    const TIMEOUT: u64 = 32;
-
     loop {
         sleep(Duration::from_secs(CLEANUP_TIMER_INTERVAL)).await;
-
 
         let mut data = success_rpa_mut().await;
         data.retain(|k, v| {
