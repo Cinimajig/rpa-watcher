@@ -96,11 +96,11 @@ pub async fn cleanup_timer() {
             let secs = v.timestamp.elapsed().as_secs();
 
             #[cfg(debug_assertions)]
-            if secs >= TIMEOUT {
+            if secs >= CLEANUP_TIMEOUT {
                 println!("Cleaning up {k}");
             }
 
-            secs < TIMEOUT
+            secs < CLEANUP_TIMEOUT
         });
     }
 }
