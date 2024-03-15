@@ -37,11 +37,11 @@ impl ProcessRobotJob {
                     .map(String::from)
                     .unwrap_or(instance.to_string()),
                 job_name: row
-                    .get::<'_, &str, _>("instance_id")
+                    .get::<'_, &str, _>("job_name")
                     .map(String::from)
                     .unwrap_or_default(),
                 cause_text: row
-                    .get::<'_, &str, _>("instance_id")
+                    .get::<'_, &str, _>("cause_text")
                     .map(String::from)
                     .unwrap_or_default(),
             }),
