@@ -23,7 +23,7 @@ It consist of two components (well, three):
 
 | Platform       | Implemented | InstanceID | InstanceName |
 | -------------- | ----------- | ---------- | ------------ |
-| [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | Planned |
+| [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | Implemented (v0.1.4) |
 | [Power Automate Desktop](https://powerautomate.microsoft.com) | Yes | Yes | Planned |
 | [UIPath](https://uipath.com) | Not yet |  | |
 | More to come | Not yet |  |  |
