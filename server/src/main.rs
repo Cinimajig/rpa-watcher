@@ -9,8 +9,8 @@ use axum::{
     http::{StatusCode, Uri},
     Router,
 };
-use tokio::sync::RwLock;
 use std::{env, sync::Arc};
+use tokio::sync::RwLock;
 use tower_http::services::ServeDir;
 
 #[tokio::main]
@@ -52,7 +52,6 @@ async fn main() -> anyhow::Result<()> {
             "/",
             ServeDir::new("wwwroot").not_found_service(fallback.into_service()),
         )
-        
         .nest("/api", api::router(api::GLobalState { prdb, paapi }));
     let listener = tokio::net::TcpListener::bind(("0.0.0.0", http_port)).await?;
 

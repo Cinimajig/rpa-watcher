@@ -1,9 +1,12 @@
-use std::sync::Arc;
 use crate::rpa_state::*;
 use axum::{
-    extract::State, http::StatusCode, routing::{get, post}, Json, Router
+    extract::State,
+    http::StatusCode,
+    routing::{get, post},
+    Json, Router,
 };
 use rpa::RpaData;
+use std::sync::Arc;
 use tokio::{sync::RwLock, time::Instant};
 
 // type MaybeDatabase = Option<Arc<RwLock<db::Database>>>;
@@ -72,16 +75,18 @@ async fn post_checkin(
         // Search the PR database for a name.
         if let Some(db_client) = state.clone().prdb {
             let mut client = db_client.write().await;
-            match crate::db::ProcessRobotJob::query_instance(&mut client, &value.data.instance).await {
+            match crate::db::ProcessRobotJob::query_instance(&mut client, &value.data.instance)
+                .await
+            {
                 Ok(pr) => {
                     value.data.flow_id = Some(pr.job_name);
                     value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
-                },
+                }
                 Err(err) => {
                     if cfg!(debug_assertions) {
                         eprintln!("Failed to find ProcessRobot job. {err}");
                     }
-                },
+                }
             }
         }
 
