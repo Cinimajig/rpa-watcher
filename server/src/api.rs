@@ -1,17 +1,23 @@
 use std::sync::Arc;
-use crate::{db, rpa_state::*};
+use crate::rpa_state::*;
 use axum::{
     extract::State, http::StatusCode, routing::{get, post}, Json, Router
 };
 use rpa::RpaData;
 use tokio::{sync::RwLock, time::Instant};
 
-type MaybeDatabase = Option<Arc<RwLock<db::Database>>>;
+// type MaybeDatabase = Option<Arc<RwLock<db::Database>>>;
 
 const CLEANUP_TIMER_INTERVAL: u64 = 5;
 const CLEANUP_TIMEOUT: u64 = 32;
 
-pub fn router(database: MaybeDatabase) -> Router {
+#[derive(Clone)]
+pub struct GLobalState {
+    pub prdb: Option<Arc<RwLock<crate::db::Database>>>,
+    pub paapi: Option<Arc<RwLock<crate::pa_api::PowerAutomateAPI>>>,
+}
+
+pub fn router(database: GLobalState) -> Router {
     // let buffer_data: RpaState = RpaState::new(
     //     HashMap::with_capacity(10), HashMap::with_capacity(20)
     // );
@@ -44,7 +50,7 @@ async fn get_rpadata(// headers: HeaderMap,
 
 async fn post_checkin(
     // headers: HeaderMap,
-    State(database): State<MaybeDatabase>,
+    State(state): State<GLobalState>,
     Json(payload): Json<Vec<RpaData>>,
 ) -> StatusCode {
     #[cfg(debug_assertions)]
@@ -64,7 +70,7 @@ async fn post_checkin(
         let mut value = RpaValue::new(now, item);
 
         // Search the PR database for a name.
-        if let Some(db_client) = database.clone() {
+        if let Some(db_client) = state.clone().prdb {
             let mut client = db_client.write().await;
             match crate::db::ProcessRobotJob::query_instance(&mut client, &value.data.instance).await {
                 Ok(pr) => {

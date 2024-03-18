@@ -1,8 +1,6 @@
 use std::{env, fs};
 
 const DEFAULT_PORT: u16 = 80;
-const DEFAULT_API_VERSION: &str = "v9.2";
-
 
 pub struct PRConfig {
     pub http_port: u16,
