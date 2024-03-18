@@ -76,10 +76,15 @@ async fn post_checkin(
             rpa::RpaEngine::PowerAutomate => {
                 if let Some(paapi) = state.clone().paapi {
                     let mut client = paapi.write().await;
-                    let id = value.data.flow_id.as_ref();
+                    let Some(id) = value.data.flow_id.as_ref() else {
+                        if cfg!(debug_assertions) {
+                            eprintln!("didn't have flow id for instance: {}", &value.data.instance);
+                        }
+                        break;
+                    };
                     match crate::pa_api::lookup_uiflow(
                         &mut client,
-                        id.unwrap_or(&"<None>".to_string()),
+                        id,
                     ).await {
                         Ok(flow_name) => value.data.flow_id = Some(flow_name),
                         Err(err) => {
