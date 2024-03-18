@@ -1,13 +1,15 @@
 use std::{env, fs};
 
 const DEFAULT_PORT: u16 = 80;
+const DEFAULT_API_VERSION: &str = "v9.2";
 
-pub struct Config {
+
+pub struct PRConfig {
     pub http_port: u16,
     pub db_conn_str: Option<String>,
 }
 
-impl Config {
+impl PRConfig {
     pub fn load() -> Self {
         let http_port = match env::var("HTTP_PLATFORM_PORT").or(env::var("ASPNETCORE_PORT")) {
             Ok(port) => port.parse().unwrap_or(DEFAULT_PORT),

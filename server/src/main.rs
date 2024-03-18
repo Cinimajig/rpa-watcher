@@ -1,6 +1,7 @@
 mod api;
 mod config;
 mod db;
+mod pa_api;
 mod rpa_state;
 
 use axum::{
@@ -13,28 +14,28 @@ use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config::Config {
+    #[cfg(debug_assertions)]
+    for (name, val) in env::vars() {
+        println!("{name}={val}");
+    }
+
+    let config::PRConfig {
         http_port,
         db_conn_str,
-    } = config::Config::load();
+        ..
+    } = config::PRConfig::load();
 
     let database = match db_conn_str {
-        Some(db_conn_str) => {
-            match db::create(&db_conn_str).await {
-                Ok(db) => Some(db),
-                Err(err) => {
-                    eprintln!("Error connectiong to ProcessRobot database. {err}");
-                    None
-                }
+        Some(db_conn_str) => match db::create(&db_conn_str).await {
+            Ok(db) => Some(db),
+            Err(err) => {
+                eprintln!("Error connectiong to ProcessRobot database. {err}");
+                None
             }
         },
         None => None,
     };
 
-    #[cfg(debug_assertions)]
-    for (name, val) in env::vars() {
-        println!("{name}={val}");
-    }
 
     let app = Router::new()
         .nest_service(
