@@ -1,10 +1,11 @@
+#![allow(dead_code)]
+
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::{env, fs, io};
-use tokio::{sync::RwLock, time::Instant};
+use tokio::time::Instant;
 
 const DEFAULT_VERSION: &str = "9.2";
-
-// static mut CONNECTION: Option<RwLock<PowerAutomateAPI>> = None;
 
 #[derive(Debug, Serialize)]
 pub struct OAuthData {
@@ -131,11 +132,17 @@ impl Token {
         cred: &OAuthData,
         teanant_id: &str,
     ) -> reqwest::Result<()> {
+        let scope = format!(
+            "https://{}.api.{}.dynamics.com/.default",
+            &cred.org_env.0, cred.org_env.1
+        );
+        let value = json!({"client_id": &cred.client_id, "scope": scope, "client_secret": &cred.client_secret, "grant_type": "client_credentials"});
+
         let res = reqwest::Client::new()
             .post(format!(
                 "https://login.microsoftonline.com/{teanant_id}/oauth2/v2.0/token"
             ))
-            .form(cred)
+            .form(&value)
             .send()
             .await?
             .error_for_status()?;
@@ -154,10 +161,16 @@ pub async fn lookup_uiflow(paapi: &mut PowerAutomateAPI, flow_id: &str) -> anyho
         // };
     }
 
-    // 6 = Desktop flow
-    let res = reqwest::get(format!("https://{org1}.api.{org2}.dynamics.com/api/data/v{api_version}/workflows({flow_id})?$select=name&$filter=category+eq+6", org1=&paapi.cred.org_env.0, org2=&paapi.cred.org_env.1, api_version=paapi.version)).await?.error_for_status()?;
-    let json: serde_json::Value = res.json().await?;
+    // Category 6 = Desktop flow
+    let url = format!("https://{org1}.api.{org2}.dynamics.com/api/data/v{api_version}/workflows({flow_id})?$select=name&$filter=category+eq+6", org1=&paapi.cred.org_env.0, org2=&paapi.cred.org_env.1, api_version=paapi.version);
+    let res = reqwest::Client::new()
+        .get(url)
+        .bearer_auth(&paapi.token.access_token)
+        .send()
+        .await?
+        .error_for_status()?;
 
+    let json: serde_json::Value = res.json().await?;
     match json.get("name") {
         Some(name) => Ok(name.to_string()),
         None => Err(anyhow::anyhow!("failed to find name of flow id: {flow_id}")),
