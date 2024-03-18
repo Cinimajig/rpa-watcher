@@ -72,19 +72,41 @@ async fn post_checkin(
     for item in payload.into_iter() {
         let mut value = RpaValue::new(now, item);
 
-        // Search the PR database for a name.
-        if let Some(db_client) = state.clone().prdb {
-            let mut client = db_client.write().await;
-            match crate::db::ProcessRobotJob::query_instance(&mut client, &value.data.instance)
-                .await
-            {
-                Ok(pr) => {
-                    value.data.flow_id = Some(pr.job_name);
-                    value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
+        match value.data.engine {
+            rpa::RpaEngine::PowerAutomate => {
+                if let Some(paapi) = state.clone().paapi {
+                    let mut client = paapi.write().await;
+                    let id = value.data.flow_id.as_ref();
+                    match crate::pa_api::lookup_uiflow(
+                        &mut client,
+                        id.unwrap_or(&"<None>".to_string()),
+                    ).await {
+                        Ok(flow_name) => value.data.flow_id = Some(flow_name),
+                        Err(err) => {
+                            if cfg!(debug_assertions) {
+                                eprintln!("Failed to find ProcessRobot job. {err}");
+                            }
+                        }
+                    }
                 }
-                Err(err) => {
-                    if cfg!(debug_assertions) {
-                        eprintln!("Failed to find ProcessRobot job. {err}");
+            }
+            rpa::RpaEngine::ProcessRobot => {
+                // Search the PR database for a name.
+                if let Some(db_client) = state.clone().prdb {
+                    let mut client = db_client.write().await;
+                    match crate::db::ProcessRobotJob::query_instance(
+                        &mut client,
+                        &value.data.instance,
+                    ).await {
+                        Ok(pr) => {
+                            value.data.flow_id = Some(pr.job_name);
+                            value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
+                        }
+                        Err(err) => {
+                            if cfg!(debug_assertions) {
+                                eprintln!("Failed to find ProcessRobot job. {err}");
+                            }
+                        }
                     }
                 }
             }
