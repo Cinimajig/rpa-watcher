@@ -71,45 +71,50 @@ async fn post_checkin(
     let mut data = success_rpa_mut().await;
     for item in payload.into_iter() {
         let mut value = RpaValue::new(now, item);
+        let instance = value.data.instance.clone();
 
-        match value.data.engine {
-            rpa::RpaEngine::PowerAutomate => {
-                if let Some(paapi) = state.clone().paapi {
-                    let mut client = paapi.write().await;
-                    let Some(id) = value.data.flow_id.as_ref() else {
-                        if cfg!(debug_assertions) {
-                            eprintln!("didn't have flow id for instance: {}", &value.data.instance);
-                        }
-                        break;
-                    };
-                    match crate::pa_api::lookup_uiflow(
-                        &mut client,
-                        id,
-                    ).await {
-                        Ok(flow_name) => value.data.flow_id = Some(flow_name),
-                        Err(err) => {
+        if data.contains_key(&instance) {
+            match value.data.engine {
+                rpa::RpaEngine::PowerAutomate => {
+                    if let Some(paapi) = state.clone().paapi {
+                        let mut client = paapi.write().await;
+                        let Some(id) = value.data.flow_id.as_ref() else {
                             if cfg!(debug_assertions) {
-                                eprintln!("Failed to find ProcessRobot job. {err}");
+                                eprintln!(
+                                    "didn't have flow id for instance: {}",
+                                    &value.data.instance
+                                );
+                            }
+                            break;
+                        };
+                        match crate::pa_api::lookup_uiflow(&mut client, id).await {
+                            Ok(flow_name) => value.data.flow_id = Some(flow_name),
+                            Err(err) => {
+                                if cfg!(debug_assertions) {
+                                    eprintln!("Failed to find ProcessRobot job. {err}");
+                                }
                             }
                         }
                     }
                 }
-            }
-            rpa::RpaEngine::ProcessRobot => {
-                // Search the PR database for a name.
-                if let Some(db_client) = state.clone().prdb {
-                    let mut client = db_client.write().await;
-                    match crate::db::ProcessRobotJob::query_instance(
-                        &mut client,
-                        &value.data.instance,
-                    ).await {
-                        Ok(pr) => {
-                            value.data.flow_id = Some(pr.job_name);
-                            value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
-                        }
-                        Err(err) => {
-                            if cfg!(debug_assertions) {
-                                eprintln!("Failed to find ProcessRobot job. {err}");
+                rpa::RpaEngine::ProcessRobot => {
+                    // Search the PR database for a name.
+                    if let Some(db_client) = state.clone().prdb {
+                        let mut client = db_client.write().await;
+                        match crate::db::ProcessRobotJob::query_instance(
+                            &mut client,
+                            &value.data.instance,
+                        )
+                        .await
+                        {
+                            Ok(pr) => {
+                                value.data.flow_id = Some(pr.job_name);
+                                value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
+                            }
+                            Err(err) => {
+                                if cfg!(debug_assertions) {
+                                    eprintln!("Failed to find ProcessRobot job. {err}");
+                                }
                             }
                         }
                     }
@@ -117,7 +122,7 @@ async fn post_checkin(
             }
         }
 
-        data.insert(value.data.instance.clone(), value);
+        data.insert(instance, value);
     }
 
     StatusCode::OK
