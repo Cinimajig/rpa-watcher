@@ -32,7 +32,7 @@ It consist of two components (well, three):
 - [x] <s>Add child flow support (client/server).</s>
 - [x] <s>Add child flow support (website).</s>
 - [x] <s>Add database connection for ProcessRobot (server).</s>
-- [ ] <s>Add api lookup with flow names for Power Automate (server).</s>
+- [x] <s>Add api lookup with flow names for Power Automate (server).</s>
 - [ ] Add history overview (server/website).
 - [ ] Add failed overview (server/website).
 
