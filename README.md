@@ -23,16 +23,16 @@ It consist of two components (well, three):
 
 | Platform       | Implemented | InstanceID | InstanceName |
 | -------------- | ----------- | ---------- | ------------ |
-| [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | Implemented (v0.1.4) |
-| [Power Automate Desktop](https://powerautomate.microsoft.com) | Yes | Yes | Planned |
+| [ProcessRobot](https://learn.microsoft.com/en-us/power-automate/desktop-flows/softomotive-migrator) | Yes | Yes | [Implemented (v0.1.4)](ProcessRobotDB.md) |
+| [Power Automate Desktop](https://powerautomate.microsoft.com) | Yes | Yes | [Implemented (v0.1.5)](PowerAutomateAPI.md) |
 | [UIPath](https://uipath.com) | Not yet |  | |
 | More to come | Not yet |  |  |
 
 ## Todo list (for now)
 - [x] <s>Add child flow support (client/server).</s>
 - [x] <s>Add child flow support (website).</s>
-- [ ] Add database connection for ProcessRobot (server).
-- [ ] Add api lookup with flow names for Power Automate (server).
+- [x] <s>Add database connection for ProcessRobot (server).</s>
+- [ ] <s>Add api lookup with flow names for Power Automate (server).</s>
 - [ ] Add history overview (server/website).
 - [ ] Add failed overview (server/website).
 
