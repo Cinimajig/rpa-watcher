@@ -50,7 +50,7 @@ main {
     display: table-cell;
     text-overflow: ellipsis;
     overflow: hidden !important;
-    /* white-space: nowrap; */
+    white-space: nowrap;
 }
 
 .tbody .tr:last-of-type {
@@ -66,6 +66,7 @@ main {
     display: table;
     margin: 0 auto;
     width: 100%;
+    table-layout: fixed;
 }
 
 .tfoot {
@@ -100,4 +101,13 @@ div.pr {
 .tbody .tr:nth-child(2n) .ptr {
     background-color: #b60932 !important;
     color: white;
+}
+
+.td .image, .image {
+    height: 1.5em;
+}
+
+.table.wordbreak .td {
+    word-break: break-word !important;
+    white-space: break-spaces !important;
 }

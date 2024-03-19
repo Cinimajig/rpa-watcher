@@ -155,10 +155,6 @@ impl Token {
 pub async fn lookup_uiflow(paapi: &mut PowerAutomateAPI, flow_id: &str) -> anyhow::Result<String> {
     if !paapi.is_authenticated() {
         paapi.authenticate().await?;
-        // match paapi.authenticate().await {
-        //     Ok(_) => (),
-        //     Err(err) => return Err(Error::new(ErrorKind::ConnectionRefused, format!("{}", err.without_url()))),
-        // };
     }
 
     // Category 6 = Desktop flow
@@ -172,7 +168,14 @@ pub async fn lookup_uiflow(paapi: &mut PowerAutomateAPI, flow_id: &str) -> anyho
 
     let json: serde_json::Value = res.json().await?;
     match json.get("name") {
-        Some(name) => Ok(name.to_string()),
+        Some(name) => {
+            // Uses `as_str` to avoid "" at the ends.
+            let Some(name) = name.as_str() else {
+                return Err(anyhow::anyhow!("failed to find name of flow id: {flow_id}"));
+            };
+
+            Ok(name.to_string())
+        },
         None => Err(anyhow::anyhow!("failed to find name of flow id: {flow_id}")),
     }
 }
