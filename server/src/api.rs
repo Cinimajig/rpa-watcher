@@ -73,7 +73,7 @@ async fn post_checkin(
         let mut value = RpaValue::new(now, item);
         let instance = value.data.instance.clone();
 
-        if data.contains_key(&instance) {
+        if !data.contains_key(&instance) {
             match value.data.engine {
                 rpa::RpaEngine::PowerAutomate => {
                     if let Some(paapi) = state.clone().paapi {
