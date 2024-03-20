@@ -70,10 +70,15 @@ async fn post_checkin(
 
     let mut data = success_rpa_mut().await;
     for item in payload.into_iter() {
-        let mut value = RpaValue::new(now, item);
-        let instance = value.data.instance.clone();
+        let instance = item.instance.clone();
 
-        if !data.contains_key(&instance) {
+        // If the item already exist, then update the timestamp.
+        if let Some(rpa_data) = data.get_mut(&instance) {
+            rpa_data.timestamp = now;
+        } else {
+            // Otherwise create a new value and try to lookup it's name.
+            let mut value = RpaValue::new(now, item);
+
             match value.data.engine {
                 rpa::RpaEngine::PowerAutomate => {
                     if let Some(paapi) = state.clone().paapi {
@@ -120,9 +125,8 @@ async fn post_checkin(
                     }
                 }
             }
+            data.insert(instance, value);
         }
-
-        data.insert(instance, value);
     }
 
     StatusCode::OK
