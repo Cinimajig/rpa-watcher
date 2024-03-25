@@ -2,7 +2,7 @@ const intervalSeconds = 5;
 const rpaView = document.querySelector('#rpa-view');
 const info = document.querySelector('.no-info');
 
-if (window.location.search.includes('word-brake')) {
+if (window.location.search.includes('word-break')) {
     rpaView.classList.add('wordbreak');
 }
 
@@ -40,7 +40,7 @@ const buildRpaConvas = async (clear) => {
         const engine = tr.querySelector('.td.engine');
         const hostname = tr.querySelector('.td.hostname');
         const trigger = tr.querySelector('.td.trigger');
-        const instance = tr.querySelector('.td.instance');
+        const started = tr.querySelector('.td.started');
         const flowId = tr.querySelector('.td.name');
         const parent = tr.querySelector('.td.parent');
 
@@ -61,8 +61,12 @@ const buildRpaConvas = async (clear) => {
         // engine.innerText = rpa[1].engine.trim();
         hostname.innerText = rpa[1].computer.trim();
         trigger.innerText = rpa[1].trigger ? rpa[1].trigger.trim() : '';
-        instance.innerText = rpa[1].instance.trim();
         flowId.innerText = rpa[1].flowId ? rpa[1].flowId.trim() : '';
+        try {
+            started.innerText = new Date(rpa[1].started.trim()).toLocaleString();
+        } catch {
+            started.innerText = '';
+        }
 
         if (rpa[1].parentInstance) {
             parent.innerText = rpa[1].parentInstance?.trim();

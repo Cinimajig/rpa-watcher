@@ -45,7 +45,9 @@ fn main() -> io::Result<Infallible> {
                     continue;
                 };
 
-                let Ok(rpa_data) = RpaData::from_cmdline(&cmdline, &comp_name) else {
+                let started = process::get_started_time(*process).ok();
+
+                let Ok(rpa_data) = RpaData::from_cmdline(&cmdline, &comp_name, started) else {
                     continue;
                 };
 

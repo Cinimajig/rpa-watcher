@@ -3,6 +3,8 @@ use std::{fmt, io};
 const GUID_LENGTH: usize = 36;
 const SMALL_GUID_LENGTH: usize = 32;
 
+pub type DateTime = chrono::DateTime<chrono::Utc>;
+
 /// Enum of RPA engings to watch.
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
@@ -67,6 +69,7 @@ pub enum RpaTrigger {
 pub struct RpaData {
     pub engine: RpaEngine,
     pub computer: String,
+    pub started: Option<DateTime>,
     pub instance: String,
     pub trigger: Option<RpaTrigger>,
     pub flow_id: Option<String>,
@@ -74,7 +77,7 @@ pub struct RpaData {
 }
 
 impl RpaData {
-    pub fn from_cmdline(args: &str, hostname: &str) -> io::Result<Self> {
+    pub fn from_cmdline(args: &str, hostname: &str, started: Option<chrono::DateTime<chrono::Utc>>) -> io::Result<Self> {
         let args = args.to_ascii_lowercase();
 
         // Find the process.
@@ -202,6 +205,7 @@ impl RpaData {
             flow_id,
             parent_instance,
             trigger,
+            started,
             // azure_data,
         })
     }
@@ -239,7 +243,7 @@ mod tests {
         // Auto generated GUIDs.
         let cmdline = r#""C:\Program Files (x86)\Power Automate Desktop\PAD.Robot.exe" --runId 9e0fc63338dd46e3b86fac1eceada33b --flowId 0d7d85e0c9744bd08bec545ef5d103af  --mode Run --trigger PadConsole --userpc --category PadConsole --correlationid "b367466d-4e80-44f8-b4b6-b0467d1d25a2" --environment "tip0" --environmentname "f7e54624-c28a-49f2-9da9-6f98ae509947" --geo "europe" --principaloid "e1b12f5e-d046-4679-ae35-c785a9d7766a" --principalpuid "1111111111111111" --region "westeurope" --sessionid "a24f7725-012c-4b3f-b55c-8ec8c1f92f1a" --tenantid "6d74b3cf-0246-4210-8b17-2042b0440806""#;
 
-        RpaData::from_cmdline(cmdline, "localhost").unwrap();
+        RpaData::from_cmdline(cmdline, "localhost", None).unwrap();
     }
 
     #[test]
@@ -251,6 +255,7 @@ mod tests {
             flow_id: Some("some-flow".to_string()),
             parent_instance: None,
             trigger: Some(RpaTrigger::default()),
+            started: None,
         };
 
         let json = serde_json::to_string_pretty(&data);

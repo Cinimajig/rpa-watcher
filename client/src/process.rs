@@ -1,5 +1,5 @@
 use crate::handles::SafeHandle;
-use std::mem;
+use std::{mem, time::SystemTime};
 use windows::{
     Wdk::System::Threading::*,
     Win32::{
@@ -98,3 +98,14 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> 
         Ok(handles)
     }
 }
+
+pub fn get_started_time(handle: HANDLE) -> windows::core::Result<rpa::DateTime> {
+    unsafe {
+        let (mut ctime, mut _etime, mut _ktime, mut _utime) = Default::default();
+        GetProcessTimes(handle, &mut ctime, &mut _etime, &mut _ktime, &mut _utime)?;
+        
+        let systime = rpa::DateTime::from(mem::transmute::<FILETIME, SystemTime>(ctime));
+
+        Ok(systime)
+    }
+} 
