@@ -9,6 +9,13 @@ if (window.location.search.includes('word-break')) {
 let rpaData = new Map();
 let failedRpaData = new Map();
 
+const parse_trigger = (str) => {
+    if (str.startsWith('Started from Console by')) {
+        return str.slice(23).trim();
+    }
+    return str;
+}
+
 const buildRpaConvas = async (clear) => {
     let data = await getRpaData();
     let failed = await getFailedRpaData();
@@ -60,7 +67,7 @@ const buildRpaConvas = async (clear) => {
 
         // engine.innerText = rpa[1].engine.trim();
         hostname.innerText = rpa[1].computer.trim();
-        trigger.innerText = rpa[1].trigger ? rpa[1].trigger.trim() : '';
+        trigger.innerText = rpa[1].trigger ? parse_trigger(rpa[1].trigger.trim()) : '';
         flowId.innerText = rpa[1].flowId ? rpa[1].flowId.trim() : '';
         try {
             started.innerText = new Date(rpa[1].started.trim()).toLocaleString();
