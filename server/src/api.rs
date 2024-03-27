@@ -180,7 +180,7 @@ pub async fn cleanup_timer(state: GlobalState) {
 
             #[cfg(debug_assertions)]
             if secs >= CLEANUP_TIMEOUT {
-                println!("Cleaning up {k}");
+                println!("Cleaning up {k}. Adding to history...");
             }
 
             secs > CLEANUP_TIMEOUT
@@ -188,7 +188,10 @@ pub async fn cleanup_timer(state: GlobalState) {
 
         // Adds it to the history and removing from running.
         removed.into_iter().for_each(|(k, v)| {
-            history.push_front(v.data);
+            // Ignore child runs in the history.
+            if v.data.parent_instance.is_none() {
+                history.push_front(v.data);
+            }
             data.remove(&k);
         });
 
