@@ -1151,7 +1151,7 @@ dependencies = [
 
 [[package]]
 name = "rpa"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "chrono",
  "serde",
@@ -1160,7 +1160,7 @@ dependencies = [
 
 [[package]]
 name = "rpa-watcher"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "rpa",
  "serde",
@@ -1172,7 +1172,7 @@ dependencies = [
 
 [[package]]
 name = "rpa-watcher-srv"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "anyhow",
  "axum",
