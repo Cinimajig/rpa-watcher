@@ -62,6 +62,8 @@ impl PowerAutomateAPI {
             if let Ok(pa_config) = fs::read_to_string(pa_config) {
                 fill_oauth(&mut this, &pa_config)?;
             }
+        } else {
+            return Err(io::Error::new(io::ErrorKind::NotFound, "file \"flow.conn\" was not found"))
         }
 
         Ok(this)

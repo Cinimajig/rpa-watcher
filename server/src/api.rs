@@ -28,7 +28,6 @@ impl RpaValue {
     }
 }
 
-
 #[derive(Clone)]
 pub struct GlobalState {
     pub kill_flag: bool,
@@ -108,7 +107,7 @@ async fn post_checkin(
 
             match value.data.engine {
                 rpa::RpaEngine::PowerAutomate => {
-                    if let Some(paapi) = state.clone().paapi {
+                    if let Some(paapi) = state.paapi.clone() {
                         let mut client = paapi.write().await;
                         let Some(id) = value.data.flow_id.as_ref() else {
                             if cfg!(debug_assertions) {
@@ -123,7 +122,7 @@ async fn post_checkin(
                             Ok(flow_name) => value.data.flow_id = Some(flow_name),
                             Err(err) => {
                                 if cfg!(debug_assertions) {
-                                    eprintln!("Failed to find ProcessRobot job. {err}");
+                                    eprintln!("Failed to find Power Automate flow. {err}");
                                 }
                             }
                         }
@@ -131,7 +130,7 @@ async fn post_checkin(
                 }
                 rpa::RpaEngine::ProcessRobot => {
                     // Search the PR database for a name.
-                    if let Some(db_client) = state.clone().prdb {
+                    if let Some(db_client) = state.prdb.clone() {
                         let mut client = db_client.write().await;
                         match crate::db::ProcessRobotJob::query_instance(
                             &mut client,
@@ -184,7 +183,7 @@ pub async fn cleanup_timer(state: GlobalState) {
                 println!("Cleaning up {k}");
             }
 
-            secs < CLEANUP_TIMEOUT
+            secs > CLEANUP_TIMEOUT
         }).map(|(k, v)| (k.clone(), v.clone())).collect();
 
         // Adds it to the history and removing from running.
