@@ -2,14 +2,13 @@ mod api;
 mod config;
 mod db;
 mod pa_api;
-mod rpa_state;
 
 use axum::{
     handler::HandlerWithoutStateExt,
     http::{StatusCode, Uri},
     Router,
 };
-use std::{env, sync::Arc};
+use std::{collections::{HashMap, VecDeque}, env, sync::Arc};
 use tokio::sync::RwLock;
 use tower_http::services::ServeDir;
 
@@ -23,7 +22,6 @@ async fn main() -> anyhow::Result<()> {
     let config::PRConfig {
         http_port,
         db_conn_str,
-        ..
     } = config::PRConfig::load();
 
     // ProcessRobot (refactor?).
@@ -47,17 +45,29 @@ async fn main() -> anyhow::Result<()> {
         }
     };
 
+    // Global application state. 
+    // This is share with each api request and the cleanup routine.
+    let mut global_state = api::GlobalState {
+        kill_flag: false,
+        prdb, paapi,
+        rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
+        failed_rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
+        history_rpa: Arc::new(RwLock::new(VecDeque::with_capacity(api::HISTORY_LIMIT))),
+    };
+
     let app = Router::new()
         .nest_service(
             "/",
             ServeDir::new("wwwroot").not_found_service(fallback.into_service()),
         )
-        .nest("/api", api::router(api::GLobalState { prdb, paapi }));
-    let listener = tokio::net::TcpListener::bind(("0.0.0.0", http_port)).await?;
+        .nest("/api", api::router(global_state.clone()));
 
-    let cleanup_job = tokio::spawn(api::cleanup_timer());
+    let listener = tokio::net::TcpListener::bind(("0.0.0.0", http_port)).await?;
+    let cleanup_job = tokio::spawn(api::cleanup_timer(global_state.clone()));
+
     axum::serve(listener, app).await?;
 
+    global_state.kill_flag = true;
     Ok(cleanup_job.await?)
 }
 

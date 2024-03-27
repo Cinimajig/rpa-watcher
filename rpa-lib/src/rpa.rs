@@ -6,7 +6,7 @@ const SMALL_GUID_LENGTH: usize = 32;
 pub type DateTime = chrono::DateTime<chrono::Utc>;
 
 /// Enum of RPA engings to watch.
-#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 #[cfg_attr(test, derive(Default))]
 pub enum RpaEngine {
@@ -51,7 +51,7 @@ impl fmt::Display for RpaEngine {
 }
 
 /// Trigger types for an RPA-process broken down to the most relevant ones.
-#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 #[cfg_attr(test, derive(Default))]
 pub enum RpaTrigger {
@@ -63,7 +63,7 @@ pub enum RpaTrigger {
 }
 
 /// Collection of relevant data for the client to watch and send to the server.
-#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Default))]
 pub struct RpaData {

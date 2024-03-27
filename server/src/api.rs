@@ -1,4 +1,4 @@
-use crate::rpa_state::*;
+use std::{collections::{HashMap, VecDeque}, sync::Arc};
 use axum::{
     extract::State,
     http::StatusCode,
@@ -6,44 +6,60 @@ use axum::{
     Json, Router,
 };
 use rpa::RpaData;
-use std::sync::Arc;
 use tokio::{sync::RwLock, time::Instant};
 
-// type MaybeDatabase = Option<Arc<RwLock<db::Database>>>;
 
-const CLEANUP_TIMER_INTERVAL: u64 = 5;
-const CLEANUP_TIMEOUT: u64 = 32;
+pub const CLEANUP_TIMER_INTERVAL: u64 = 5;
+pub const CLEANUP_TIMEOUT: u64 = 32;
+pub const DEFAULT_SIZE: usize = 10;
+pub const HISTORY_LIMIT: usize = 50;
 
-#[derive(Clone)]
-pub struct GLobalState {
-    pub prdb: Option<Arc<RwLock<crate::db::Database>>>,
-    pub paapi: Option<Arc<RwLock<crate::pa_api::PowerAutomateAPI>>>,
+pub type RpaItems = HashMap<String, RpaValue>;
+
+#[derive(PartialEq, Clone)]
+pub struct RpaValue {
+    pub timestamp: Instant,
+    pub data: RpaData,
 }
 
-pub fn router(database: GLobalState) -> Router {
-    // let buffer_data: RpaState = RpaState::new(
-    //     HashMap::with_capacity(10), HashMap::with_capacity(20)
-    // );
+impl RpaValue {
+    pub fn new(timestamp: Instant, data: RpaData) -> Self {
+        Self { timestamp, data }
+    }
+}
 
+
+#[derive(Clone)]
+pub struct GlobalState {
+    pub kill_flag: bool,
+    pub prdb: Option<Arc<RwLock<crate::db::Database>>>,
+    pub paapi: Option<Arc<RwLock<crate::pa_api::PowerAutomateAPI>>>,
+    pub rpa: Arc<RwLock<RpaItems>>,
+    pub failed_rpa: Arc<RwLock<RpaItems>>,
+    pub history_rpa: Arc<RwLock<VecDeque<RpaData>>>,
+}
+
+pub fn router(database: GlobalState) -> Router {
     Router::new()
         .route("/getrpa", get(get_rpadata))
         .route("/getfailed", get(get_failed_rpadata))
+        .route("/gethistory", get(get_history_rpadata))
         .route("/checkin", post(post_checkin))
         .with_state(database)
         .fallback(crate::fallback)
 }
 
 async fn get_failed_rpadata(// headers: HeaderMap,
-    // State(state): State<RpaState>,
+    State(state): State<GlobalState>,
 ) -> Json<Vec<RpaData>> {
-    let data = rpa_failed().await;
+    let data = state.failed_rpa.read().await;
     Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
 }
 
 async fn get_rpadata(// headers: HeaderMap,
-    // State(state): State<RpaState>,
+    State(state): State<GlobalState>,
 ) -> Json<Vec<RpaData>> {
-    let data = success_rpa().await;
+    let data = state.rpa.read().await;
 
     #[cfg(debug_assertions)]
     println!("Sending {} items", data.len());
@@ -51,9 +67,20 @@ async fn get_rpadata(// headers: HeaderMap,
     Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
 }
 
+async fn get_history_rpadata(// headers: HeaderMap,
+    State(state): State<GlobalState>,
+) -> Json<VecDeque<RpaData>> {
+    let history = state.history_rpa.read().await;
+
+    #[cfg(debug_assertions)]
+    println!("Sending {} items", history.len());
+
+    Json(history.clone())
+}
+
 async fn post_checkin(
     // headers: HeaderMap,
-    State(state): State<GLobalState>,
+    State(state): State<GlobalState>,
     Json(payload): Json<Vec<RpaData>>,
 ) -> StatusCode {
     #[cfg(debug_assertions)]
@@ -68,7 +95,7 @@ async fn post_checkin(
 
     let now = Instant::now();
 
-    let mut data = success_rpa_mut().await;
+    let mut data = state.rpa.write().await;
     for item in payload.into_iter() {
         let instance = item.instance.clone();
 
@@ -132,14 +159,24 @@ async fn post_checkin(
     StatusCode::OK
 }
 
-pub async fn cleanup_timer() {
+pub async fn cleanup_timer(state: GlobalState) {
     use tokio::time::*;
 
     loop {
+        if state.kill_flag {
+            break;
+        }
+
+        // Waits for CLEANUP_TIMER_INTERVAL seconds to not keeping it 
+        // locked all the time.
         sleep(Duration::from_secs(CLEANUP_TIMER_INTERVAL)).await;
 
-        let mut data = success_rpa_mut().await;
-        data.retain(|k, v| {
+        // Retrieves a lock for the running and history.
+        let mut data = state.rpa.write().await;
+        let mut history = state.history_rpa.write().await;
+        
+        // Collects a copy of alle the items to remove.
+        let removed: Vec<(String, RpaValue)> = data.iter().filter(|(k, v)| {
             let secs = v.timestamp.elapsed().as_secs();
 
             #[cfg(debug_assertions)]
@@ -148,6 +185,19 @@ pub async fn cleanup_timer() {
             }
 
             secs < CLEANUP_TIMEOUT
+        }).map(|(k, v)| (k.clone(), v.clone())).collect();
+
+        // Adds it to the history and removing from running.
+        removed.into_iter().for_each(|(k, v)| {
+            history.push_front(v.data);
+            data.remove(&k);
         });
+
+        // Release the lock.
+        std::mem::drop(data);
+
+        while history.len() > HISTORY_LIMIT {
+            history.pop_back();
+        }
     }
 }
