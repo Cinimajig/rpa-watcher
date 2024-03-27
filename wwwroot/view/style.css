@@ -19,12 +19,18 @@ body > p {
     text-align: center;
 }
 
+#history-view h4 {
+    font-style: italic;
+    font-weight: normal;
+    margin-left: 1em;
+}
+
 p.preview {
     color: rgba(0, 0, 0, 0.50);
 }
 
-main {
-    width: 90vw;
+.view-container {
+    width: 95vw;
     max-width: 1800px;
     background-color: white;
     margin: 8px auto;

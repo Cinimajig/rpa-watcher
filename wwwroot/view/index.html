@@ -16,7 +16,7 @@
         <div data-ref="" class="tr rpa-info">
             <div style="width: 5% !important;" class="td engine"></div>
             <div style="width: 7% !important;" class="td hostname"></div>
-            <div style="width: 7% !important;"  class="td trigger"></div>
+            <div style="width: 7% !important;" class="td trigger"></div>
             <div class="td started"></div>
             <div class="td name"></div>
             <div class="td parent"></div>
@@ -25,8 +25,8 @@
 
     <h1>RPA.Watcher</h1>
     <p class="preview"><i>This is still in preview. Not optimized for small screens</i></p>
-    <main>
-        <div class="table thead" id="rpa-header">
+    <div class="view-container">
+        <div class="table thead rpa-header">
             <div class="tr">
                 <div style="width: 5% !important;" class="td engine">Engine</div>
                 <div style="width: 7% !important;" class="td hostname">Host</div>
@@ -37,11 +37,30 @@
             </div>
         </div>
 
-        <div class="table tbody" id="rpa-view">
-        </div>
-    </main>
-
+        <div class="table tbody" id="rpa-view"></div>
+    </div>
     <p class="no-info">Nothing is running</p>
+
+    <div id="history-view">
+        <h4>History:</h4>
+        <div class="view-container">
+            <div id="history">
+                <div class="table thead rpa-header">
+                    <div class="tr">
+                        <div style="width: 5% !important;" class="td engine">Engine</div>
+                        <div style="width: 7% !important;" class="td hostname">Host</div>
+                        <div style="width: 7% !important;" class="td trigger">Trigger</div>
+                        <div class="td started">Started</div>
+                        <div class="td name">Flow</div>
+                        <div class="td parent">Parent</div>
+                    </div>
+                </div>
+
+                <div class="table tbody" id="rpa-history"></div>
+            </div>
+        </div>
+    </div>
+
 
     <script type="module" src="script.js"></script>
 </body>
