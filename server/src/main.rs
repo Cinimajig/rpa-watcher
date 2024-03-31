@@ -36,11 +36,11 @@ async fn main() -> anyhow::Result<()> {
         None => None,
     };
 
-    // Power Autmate/MS Dynamics.
+    // Power Automate/MS Dynamics.
     let paapi = match pa_api::PowerAutomateAPI::load() {
         Ok(pa) => Some(Arc::new(RwLock::new(pa))),
         Err(err) => {
-            eprintln!("Error connectiong to ProcessRobot database. {err}");
+            eprintln!("Error connectiong to Power Automate API. {err}");
             None
         }
     };
@@ -48,7 +48,7 @@ async fn main() -> anyhow::Result<()> {
     // Global application state. 
     // This is share with each api request and the cleanup routine.
     let mut global_state = api::GlobalState {
-        kill_flag: false,
+        kill_flag: Arc::new(RwLock::new(false)),
         prdb, paapi,
         rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
         failed_rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
@@ -67,7 +67,7 @@ async fn main() -> anyhow::Result<()> {
 
     axum::serve(listener, app).await?;
 
-    global_state.kill_flag = true;
+    *global_state.kill_flag.write().await = true;
     Ok(cleanup_job.await?)
 }
 

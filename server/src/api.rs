@@ -1,13 +1,15 @@
-use std::{collections::{HashMap, VecDeque}, sync::Arc};
 use axum::{
-    extract::State,
+    extract::{Query, State},
     http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
 use rpa::RpaData;
+use std::{
+    collections::{HashMap, VecDeque},
+    sync::Arc,
+};
 use tokio::{sync::RwLock, time::Instant};
-
 
 pub const CLEANUP_TIMER_INTERVAL: u64 = 5;
 pub const CLEANUP_TIMEOUT: u64 = 32;
@@ -28,9 +30,32 @@ impl RpaValue {
     }
 }
 
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ApiQuery {
+    #[serde(default = "ApiQuery::max_amount", deserialize_with = "ApiQuery::empty_as_default")]
+    amount: usize,
+}
+
+impl ApiQuery {
+    /// Parses `Self::page_size` from the incomming request. If not parsed, use the default value.
+    fn empty_as_default<'de, D: serde::Deserializer<'de>>(de: D) -> Result<usize, D::Error>
+    {
+        let opt = <Option<String> as serde::Deserialize>::deserialize(de)?;
+        match opt.as_deref() {
+            None | Some("") => Ok(Self::max_amount()),
+            Some(s) => s.parse().map_err(serde::de::Error::custom),
+        }
+    }
+
+    const fn max_amount() -> usize {
+        u32::MAX as _
+    }
+}
+
 #[derive(Clone)]
 pub struct GlobalState {
-    pub kill_flag: bool,
+    pub kill_flag: Arc<RwLock<bool>>,
     pub prdb: Option<Arc<RwLock<crate::db::Database>>>,
     pub paapi: Option<Arc<RwLock<crate::pa_api::PowerAutomateAPI>>>,
     pub rpa: Arc<RwLock<RpaItems>>,
@@ -48,14 +73,16 @@ pub fn router(database: GlobalState) -> Router {
         .fallback(crate::fallback)
 }
 
-async fn get_failed_rpadata(// headers: HeaderMap,
+async fn get_failed_rpadata(
+    // headers: HeaderMap,
     State(state): State<GlobalState>,
 ) -> Json<Vec<RpaData>> {
     let data = state.failed_rpa.read().await;
     Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
 }
 
-async fn get_rpadata(// headers: HeaderMap,
+async fn get_rpadata(
+    // headers: HeaderMap,
     State(state): State<GlobalState>,
 ) -> Json<Vec<RpaData>> {
     let data = state.rpa.read().await;
@@ -66,15 +93,29 @@ async fn get_rpadata(// headers: HeaderMap,
     Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
 }
 
-async fn get_history_rpadata(// headers: HeaderMap,
+async fn get_history_rpadata(
+    // headers: HeaderMap,
+    Query(params): Query<ApiQuery>,
     State(state): State<GlobalState>,
-) -> Json<VecDeque<RpaData>> {
+) -> Json<Vec<RpaData>> {
     let history = state.history_rpa.read().await;
+    let slices = history.as_slices();
+
+
+    // Retrieves the max amount requested for.
+    let mut buffer = Vec::with_capacity(history.len());
+    for (index, item) in slices.0.iter().chain(slices.1.iter()).enumerate() {
+        if index + 1 > params.amount {
+            break;
+        }
+
+        buffer.push(item.clone())
+    }
 
     #[cfg(debug_assertions)]
-    println!("Sending {} items", history.len());
+    println!("Requested {}, sending {} out of {} in history", params.amount, buffer.len(), history.len());
 
-    Json(history.clone())
+    Json(buffer)
 }
 
 async fn post_checkin(
@@ -162,29 +203,33 @@ pub async fn cleanup_timer(state: GlobalState) {
     use tokio::time::*;
 
     loop {
-        if state.kill_flag {
+        if *state.kill_flag.read().await {
             break;
         }
 
-        // Waits for CLEANUP_TIMER_INTERVAL seconds to not keeping it 
+        // Waits for CLEANUP_TIMER_INTERVAL seconds to not keeping it
         // locked all the time.
         sleep(Duration::from_secs(CLEANUP_TIMER_INTERVAL)).await;
 
         // Retrieves a lock for the running and history.
         let mut data = state.rpa.write().await;
         let mut history = state.history_rpa.write().await;
-        
+
         // Collects a copy of alle the items to remove.
-        let removed: Vec<(String, RpaValue)> = data.iter().filter(|(k, v)| {
-            let secs = v.timestamp.elapsed().as_secs();
+        let removed: Vec<(String, RpaValue)> = data
+            .iter()
+            .filter(|(k, v)| {
+                let secs = v.timestamp.elapsed().as_secs();
 
-            #[cfg(debug_assertions)]
-            if secs >= CLEANUP_TIMEOUT {
-                println!("Cleaning up {k}. Adding to history...");
-            }
+                #[cfg(debug_assertions)]
+                if secs >= CLEANUP_TIMEOUT {
+                    println!("Cleaning up {k}. Adding to history...");
+                }
 
-            secs > CLEANUP_TIMEOUT
-        }).map(|(k, v)| (k.clone(), v.clone())).collect();
+                secs > CLEANUP_TIMEOUT
+            })
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect();
 
         // Adds it to the history and removing from running.
         removed.into_iter().for_each(|(k, v)| {
