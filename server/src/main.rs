@@ -47,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Global application state. 
     // This is share with each api request and the cleanup routine.
-    let mut global_state = api::GlobalState {
+    let global_state = api::GlobalState {
         kill_flag: Arc::new(RwLock::new(false)),
         prdb, paapi,
         rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
