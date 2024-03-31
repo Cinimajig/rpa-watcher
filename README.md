@@ -9,9 +9,6 @@ The idea is to have a closer and more central view of what RPA-processes, flows 
 
 Sometimes the central view is just lagging behind or some times just lying (Power Automate). This software is intended to run along side the RPA process and confirm what is running at the moment.
 
-> [!NOTE]
-> Currently it's not able to detect precisely in a human readable format, but that is planned for the future. Like translating an ID to a name.
-
 It consist of two components (well, three):
 - The client/agent. This is supposed to run on the OS, that performs the RPA-task. This client is Windows exclusive.
 - The server. It can run on both Linux and Windows (maybe MacOS) and should be able to be used in [IIS](https://en.wikipedia.org/wiki/Internet_Information_Services). This you can implement yourself if you want.
