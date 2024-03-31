@@ -14,8 +14,8 @@ Sometimes the central view is just lagging behind or some times just lying (Powe
 
 It consist of two components (well, three):
 - The client/agent. This is supposed to run on the OS, that performs the RPA-task. This client is Windows exclusive.
-- The server. It can run on both Linux and Windows (maybe MacOS) and should be able to be used in [IIS](https://en.wikipedia.org/wiki/Internet_Information_Services). This you can implement youself if you want.
-- the website (wwwroot). This is not a required component of the server module, but you might need the folder to exist for it to work. Feel free to implement this site yourself if you want.
+- The server. It can run on both Linux and Windows (maybe MacOS) and should be able to be used in [IIS](https://en.wikipedia.org/wiki/Internet_Information_Services). This you can implement yourself if you want.
+- the website (wwwroot). This is not a required component of the server module, but you might need the folder to exist for it to work. Feel free to implement this site yourself if you want, but the folder must exist.
 
 ## Supported platforms
 - `InstanceID` == The unique ID of the running instance.
@@ -33,7 +33,7 @@ It consist of two components (well, three):
 - [x] <s>Add child flow support (website).</s>
 - [x] <s>Add database connection for ProcessRobot (server).</s>
 - [x] <s>Add api lookup with flow names for Power Automate (server).</s>
-- [ ] Add history overview (server/website).
+- [x] Add history overview (server/website).
 - [ ] Add failed overview (server/website).
 
 ## Building from source
