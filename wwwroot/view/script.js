@@ -4,7 +4,7 @@ const rpaHistoryView = document.querySelector('#rpa-history');
 const historyViewContainer = document.querySelector('#history-view');
 const info = document.querySelector('.no-info');
 
-const defaultLogo = `<img src="parent.svg" alt="Unknown engine" class="image" />`;
+const defaultLogo = `<img src="parent.svg" alt="Unknown engine or child flow" class="image" />`;
 const paLogo = `<img src="PALogo.png" alt="Power Automate" class="image" />`;
 const prLogo = `<img src="PRLogo.png" alt="ProcessRobot" class="image" />`;
 
@@ -112,7 +112,7 @@ const appendItems = (root, items, noParent) => {
 
         hostname.innerText = rpa[1].computer.trim();
         trigger.innerText = rpa[1].trigger ? parse_trigger(rpa[1].trigger.trim()) : '';
-        flowId.innerText = rpa[1].flowId ? rpa[1].flowId.trim() : '';
+        flowId.innerText = rpa[1].flowId ? rpa[1].flowId.trim() : rpa[1].instance.trim();
         try {
             started.innerText = new Date(rpa[1].started.trim()).toLocaleString();
         } catch {
@@ -123,8 +123,8 @@ const appendItems = (root, items, noParent) => {
             parent.innerText = rpa[1].parentInstance?.trim();
             let parentElement = document.querySelector(`.tr.rpa-info[data-ref="${rpa[1].parentInstance}"`);
 
+            engine.innerHTML = defaultLogo;
             if (parentElement && parentElement.nextSibling) {
-                engine.innerHTML = defaultLogo;
                 root.insertBefore(tr, parentElement.nextSibling);
                 continue;
             }
