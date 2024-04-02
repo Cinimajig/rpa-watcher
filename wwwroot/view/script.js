@@ -80,7 +80,6 @@ const buildHistory = async (clear) => {
 
 const appendItems = (root, items, noParent) => {
     for (let rpa of items) {
-        info.style.display = '';
         if (root.querySelector(`.tr.rpa-info[data-ref="${rpa[0]}"`)) {
             continue;
         }
