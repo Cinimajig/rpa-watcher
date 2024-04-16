@@ -1,11 +1,12 @@
 # Connecting to the Power Automate API / MS Dynamics
-| Encoding | File        |
+| Priority | Type/File   |
 | -------- | ----------- |
-| UTF-8    | `flow.conn` |
+| 1.       | $RW_PACONN  |
+| 2.       | `flow.conn` |
 
-To make the server display names of the Power Autmate flows, you need allow to lookup the names in your PA enviorment. 
+To make the server display names of the Power Autmate flows, you need allow the server to lookup the names in your PA enviorment. 
 
-This is done by creating a file next to the server, called `flow.conn` and make it contain 4 values. An example can be seen [here](#server-file)
+This is done by either using the env. variable `RW_PACONN` or creating a file next to the server, called `flow.conn` and make it contain 4 values. An example can be seen [here](#server-file)
 
 This has a little setup, before it can be used.
 
@@ -32,6 +33,11 @@ The Organization link can be found on the enviorment you want to lookup in. An o
 Once you have found the enviorment you want to use, you need to copy the first 2 parts of the org. link.
 
 Example: `org12345678.crm0`. The actual UUID is not needed.
+
+## Envirorment variable
+```Batch
+SETX RW_PACONN "ClientId=d5658550-c392-43a4-976c-81abc1162f30&ClientSecret=JaKgIhLwvFwvQIpsOQLKNyKTZLdbOgolGGyCukZs&TeanantId=443f3e5f-3a29-4baa-a8b4-9eefcc82e4e1&OrgId=org12345678.crm0"
+```
 
 ## server file
 The file should look something like this (*Not real data*):
