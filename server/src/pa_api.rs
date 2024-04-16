@@ -49,21 +49,26 @@ impl PowerAutomateAPI {
             token_time: Instant::now(),
         };
 
-        let Ok(mut pa_config) = env::current_exe() else {
-            return Err(io::Error::new(
-                io::ErrorKind::NotFound,
-                "path to the server wasn't found",
-            ));
-        };
-        pa_config.pop();
-        pa_config.push("flow.conn");
-
-        if pa_config.is_file() {
-            if let Ok(pa_config) = fs::read_to_string(pa_config) {
-                fill_oauth(&mut this, &pa_config)?;
-            }
+        if let Ok(pa_config_sl) = env::var("RW_PACONN") {
+            let pa_config_sl = pa_config_sl.replace("&", "");
+            fill_oauth(&mut this, &pa_config_sl)?;
         } else {
-            return Err(io::Error::new(io::ErrorKind::NotFound, "file \"flow.conn\" was not found"))
+            let Ok(mut pa_config) = env::current_exe() else {
+                return Err(io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "path to the server wasn't found",
+                ));
+            };
+            pa_config.pop();
+            pa_config.push("flow.conn");
+
+            if pa_config.is_file() {
+                if let Ok(pa_config) = fs::read_to_string(pa_config) {
+                    fill_oauth(&mut this, &pa_config)?;
+                }
+            } else {
+                return Err(io::Error::new(io::ErrorKind::NotFound, "file \"flow.conn\" was not found"))
+            }
         }
 
         Ok(this)

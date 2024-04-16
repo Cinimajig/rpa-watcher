@@ -9,7 +9,7 @@ pub struct PRConfig {
 
 impl PRConfig {
     pub fn load() -> Self {
-        let http_port = match env::var("HTTP_PLATFORM_PORT").or(env::var("ASPNETCORE_PORT")) {
+        let http_port = match env::var("HTTP_PLATFORM_PORT").or(env::var("ASPNETCORE_PORT")).or(env::var("RW_PORT")) {
             Ok(port) => port.parse().unwrap_or(DEFAULT_PORT),
             _ => DEFAULT_PORT,
         };
@@ -19,15 +19,19 @@ impl PRConfig {
             db_conn_str: None,
         };
 
-        let Ok(mut db_config) = env::current_exe() else {
-            return this;
-        };
-        db_config.pop();
-        db_config.push("db.conn");
+        if let Ok(db_conn_str) = env::var("RW_DBCONN") {
+            this.db_conn_str = parse_db_config(&db_conn_str);
+        } else {
+            let Ok(mut db_config) = env::current_exe() else {
+                return this;
+            };
+            db_config.pop();
+            db_config.push("db.conn");
 
-        if db_config.is_file() {
-            if let Ok(db_config) = fs::read_to_string(db_config) {
-                this.db_conn_str = parse_db_config(&db_config);
+            if db_config.is_file() {
+                if let Ok(db_config) = fs::read_to_string(db_config) {
+                    this.db_conn_str = parse_db_config(&db_config);
+                }
             }
         }
 
