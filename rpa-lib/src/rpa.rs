@@ -59,7 +59,7 @@ pub enum RpaTrigger {
     Attended,
     Unattended,
     #[serde(untagged)]
-    Custom(String)
+    Custom(String),
 }
 
 /// Collection of relevant data for the client to watch and send to the server.
@@ -77,7 +77,11 @@ pub struct RpaData {
 }
 
 impl RpaData {
-    pub fn from_cmdline(args: &str, hostname: &str, started: Option<chrono::DateTime<chrono::Utc>>) -> io::Result<Self> {
+    pub fn from_cmdline(
+        args: &str,
+        hostname: &str,
+        started: Option<chrono::DateTime<chrono::Utc>>,
+    ) -> io::Result<Self> {
         let args = args.to_ascii_lowercase();
 
         // Find the process.

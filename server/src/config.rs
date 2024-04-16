@@ -9,7 +9,10 @@ pub struct PRConfig {
 
 impl PRConfig {
     pub fn load() -> Self {
-        let http_port = match env::var("HTTP_PLATFORM_PORT").or(env::var("ASPNETCORE_PORT")).or(env::var("RW_PORT")) {
+        let http_port = match env::var("HTTP_PLATFORM_PORT")
+            .or(env::var("ASPNETCORE_PORT"))
+            .or(env::var("RW_PORT"))
+        {
             Ok(port) => port.parse().unwrap_or(DEFAULT_PORT),
             _ => DEFAULT_PORT,
         };

@@ -8,7 +8,11 @@ use axum::{
     http::{StatusCode, Uri},
     Router,
 };
-use std::{collections::{HashMap, VecDeque}, env, sync::Arc};
+use std::{
+    collections::{HashMap, VecDeque},
+    env,
+    sync::Arc,
+};
 use tokio::sync::RwLock;
 use tower_http::services::ServeDir;
 
@@ -45,11 +49,12 @@ async fn main() -> anyhow::Result<()> {
         }
     };
 
-    // Global application state. 
+    // Global application state.
     // This is share with each api request and the cleanup routine.
     let global_state = api::GlobalState {
         kill_flag: Arc::new(RwLock::new(false)),
-        prdb, paapi,
+        prdb,
+        paapi,
         rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
         failed_rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
         history_rpa: Arc::new(RwLock::new(VecDeque::with_capacity(api::HISTORY_LIMIT))),

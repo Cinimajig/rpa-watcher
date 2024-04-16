@@ -33,14 +33,16 @@ impl RpaValue {
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ApiQuery {
-    #[serde(default = "ApiQuery::max_amount", deserialize_with = "ApiQuery::empty_as_default")]
+    #[serde(
+        default = "ApiQuery::max_amount",
+        deserialize_with = "ApiQuery::empty_as_default"
+    )]
     amount: usize,
 }
 
 impl ApiQuery {
     /// Parses `Self::page_size` from the incomming request. If not parsed, use the default value.
-    fn empty_as_default<'de, D: serde::Deserializer<'de>>(de: D) -> Result<usize, D::Error>
-    {
+    fn empty_as_default<'de, D: serde::Deserializer<'de>>(de: D) -> Result<usize, D::Error> {
         let opt = <Option<String> as serde::Deserialize>::deserialize(de)?;
         match opt.as_deref() {
             None | Some("") => Ok(Self::max_amount()),
@@ -101,7 +103,6 @@ async fn get_history_rpadata(
     let history = state.history_rpa.read().await;
     let slices = history.as_slices();
 
-
     // Retrieves the max amount requested for.
     let mut buffer = Vec::with_capacity(history.len());
     for (index, item) in slices.0.iter().chain(slices.1.iter()).enumerate() {
@@ -113,7 +114,12 @@ async fn get_history_rpadata(
     }
 
     #[cfg(debug_assertions)]
-    println!("Requested {}, sending {} out of {} in history", params.amount, buffer.len(), history.len());
+    println!(
+        "Requested {}, sending {} out of {} in history",
+        params.amount,
+        buffer.len(),
+        history.len()
+    );
 
     Json(buffer)
 }

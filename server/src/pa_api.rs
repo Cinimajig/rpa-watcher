@@ -67,7 +67,10 @@ impl PowerAutomateAPI {
                     fill_oauth(&mut this, &pa_config)?;
                 }
             } else {
-                return Err(io::Error::new(io::ErrorKind::NotFound, "file \"flow.conn\" was not found"))
+                return Err(io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "file \"flow.conn\" was not found",
+                ));
             }
         }
 
@@ -182,7 +185,7 @@ pub async fn lookup_uiflow(paapi: &mut PowerAutomateAPI, flow_id: &str) -> anyho
             };
 
             Ok(name.to_string())
-        },
+        }
         None => Err(anyhow::anyhow!("failed to find name of flow id: {flow_id}")),
     }
 }
