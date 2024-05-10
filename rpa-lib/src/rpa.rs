@@ -224,7 +224,7 @@ pub struct Workflow {
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Default))]
 pub struct Action {
-    system_action_name: String,
+    name: String,
     function_name: String,
     index: u32,
     inside_error_handling: bool,
