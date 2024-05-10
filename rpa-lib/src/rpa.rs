@@ -71,6 +71,8 @@ pub struct RpaData {
     pub computer: String,
     pub started: Option<DateTime>,
     pub instance: String,
+    pub name: Option<String>,
+    pub action: Option<Action>,
     pub trigger: Option<RpaTrigger>,
     pub flow_id: Option<String>,
     pub parent_instance: Option<String>,
@@ -183,36 +185,49 @@ impl RpaData {
             RpaEngine::ProcessRobot => None,
         };
 
-        // let tenant_id = match engine {
-        //     RpaEngine::PowerAutomate => find_parameter(&args, "--tenantid \"", GUID_LENGTH),
-        //     // TODO! decode --serverBaseUriB64?
-        //     RpaEngine::ProcessRobot => None,
-        // };
-
-        // let azure_data = match (flow_id, tenant_id) {
-        //     (Some(f), Some(t)) => Some(AzureData {
-        //         flow_id: f,
-        //         tenant_id: t.to_string(),
-        //     }),
-        //     _ => None,
-        // };
-
         // let env = match env {
         //     Some(e) if e.contains("one-drive") => None,
         //     Some(e) => Some(e),
         //     None => None,
         // };
+
         Ok(RpaData {
             engine,
             computer: hostname.to_string(),
             instance: run_id,
             flow_id,
+            name: None,
+            action: None,
             parent_instance,
             trigger,
             started,
             // azure_data,
         })
     }
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(test, derive(Default))]
+pub struct RunDefinition {
+    pub workflow: Workflow,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(test, derive(Default))]
+pub struct Workflow {
+    pub name: String,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(test, derive(Default))]
+pub struct Action {
+    system_action_name: String,
+    function_name: String,
+    index: u32,
+    inside_error_handling: bool,
 }
 
 fn find_parameter<'a>(cmdline_lc: &'a str, param: &'a str, length: usize) -> Option<&'a str> {
@@ -260,6 +275,8 @@ mod tests {
             parent_instance: None,
             trigger: Some(RpaTrigger::default()),
             started: None,
+            name: Some("Test flow".to_string()),
+            action: None,
         };
 
         let json = serde_json::to_string_pretty(&data);

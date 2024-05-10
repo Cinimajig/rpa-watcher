@@ -47,9 +47,35 @@ fn main() -> io::Result<Infallible> {
 
                 let started = process::get_started_time(*process).ok();
 
-                let Ok(rpa_data) = RpaData::from_cmdline(&cmdline, &comp_name, started) else {
+                let Ok(mut rpa_data) = RpaData::from_cmdline(&cmdline, &comp_name, started) else {
                     continue;
                 };
+
+                // let username = match process::get_name(*process) {
+                //     Ok(s) => s,
+                //     Err(err) => {
+                //         dbg_output(format!("<RPA.Watcher> Failed to get username. {err}"));
+                //         items.push(rpa_data);
+                //         continue;
+                //     },
+                // };
+
+                'name_and_action: {
+                    if rpa_data.engine == RpaEngine::PowerAutomate {
+                        let Some(path_run) =
+                            process::find_log_path(&cmdline, &rpa_data.flow_id.clone().unwrap_or_default(), &rpa_data.instance)
+                        else {
+                            break 'name_and_action;
+                        };
+
+                        if !path_run.is_dir() {
+                            dbg_output(format!("<RPA.Watcer> Can't find Directory: {}.", path_run.to_string_lossy()));
+                            break 'name_and_action;
+                        }
+
+                        process::get_pad_name_and_action(path_run, &mut rpa_data.name, &mut rpa_data.action);
+                    }
+                }
 
                 items.push(rpa_data);
             }

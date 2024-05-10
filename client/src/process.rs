@@ -1,14 +1,12 @@
 use crate::handles::SafeHandle;
-use std::{mem, time::SystemTime};
+use std::{fs, mem, path, time::SystemTime};
 use windows::{
-    Wdk::System::Threading::*,
-    Win32::{
-        Foundation::*,
-        System::{
+    core::PWSTR, Wdk::System::Threading::*, Win32::{
+        Foundation::*, Security::*, System::{
             Diagnostics::{Debug::*, ToolHelp::*},
             Threading::*,
-        },
-    },
+        }
+    }
 };
 
 /// Get's the commandline of the process handle.
@@ -99,6 +97,41 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> 
     }
 }
 
+/// Prototype.
+#[allow(unused)]
+pub fn get_name(handle: HANDLE) -> windows::core::Result<String> {
+    unsafe {
+        // Opens the token on the process.
+        let mut token = SafeHandle::<true>(HANDLE(0));
+        OpenProcessToken(handle, TOKEN_QUERY, &mut *token)?;
+
+        // Retrieves the size of the user information. Error will be ignored.
+        let mut size = 0;
+        GetTokenInformation(*token, TokenUser, None, 0, &mut size).unwrap_or_default();
+
+        // Retrieves the user information.
+        // It has to be a buffer, to store the SID.
+        let mut token_user_buffer = vec![0u8; size as usize];
+        let token_user = token_user_buffer.as_ptr().cast::<TOKEN_USER>();
+        let mut sid_use = SID_NAME_USE::default();
+        GetTokenInformation(*token, TokenUser, Some(token_user_buffer.as_mut_ptr() as _), size, &mut size)?;
+    
+        
+        // Retrieves the size of the username. Error will be ignored.
+        let mut user_size = 0;
+        let mut domain_size = 0;
+        LookupAccountSidW(None, (*token_user).User.Sid, PWSTR::null(), &mut user_size, PWSTR::null(), &mut domain_size, &mut sid_use).unwrap_or_default();
+
+        // Retrieves the username.
+        let mut username = vec![0u16; user_size as usize + 1];
+        let mut domain = vec![0u16; domain_size as usize + 1];
+        LookupAccountSidW(None, (*token_user).User.Sid, PWSTR::from_raw(username.as_mut_ptr()), &mut user_size, PWSTR::from_raw(domain.as_mut_ptr()), &mut domain_size, &mut sid_use)?;
+
+        // Converts to a string.
+        Ok(String::from_utf16_lossy(&username[..user_size as usize]))
+    }
+}
+
 pub fn get_started_time(handle: HANDLE) -> windows::core::Result<rpa::DateTime> {
     unsafe {
         let (mut ctime, mut _etime, mut _ktime, mut _utime) = Default::default();
@@ -108,4 +141,62 @@ pub fn get_started_time(handle: HANDLE) -> windows::core::Result<rpa::DateTime> 
 
         Ok(systime)
     }
+}
+
+pub fn find_log_path(cmdline_lc: &str, flow_id: &str, instance: &str) -> Option<path::PathBuf> {
+    const PARAM: &str = "--executionlogspath ";
+
+    if flow_id.is_empty() {
+        return None;
+    }
+
+    let Some(start_pos) = cmdline_lc.find(PARAM).map(|i| i + PARAM.len()) else {
+        return None;
+    };
+
+    let mut short_args = &cmdline_lc[start_pos..];
+    if short_args.starts_with('"') {
+        let Some(last_index) = &short_args[1..].find('"') else {
+            return None;
+        };
+
+        short_args = &short_args[1..*last_index + 1];
+    }
+
+    let mut log_path = path::PathBuf::from(short_args);
+    log_path.push("Scripts");
+    log_path.push(flow_id);
+    log_path.push("Runs");
+    log_path.push(instance);
+
+    Some(log_path)
+}
+
+pub fn get_pad_name_and_action(
+    mut path_run: path::PathBuf,
+    name: &mut Option<String>,
+    action: &mut Option<rpa::Action>,
+) {
+    path_run.push("RunDefinition.json");
+
+    let Ok(json) = fs::read_to_string(&path_run) else {
+        return;
+    };
+
+    let run_defination = serde_json::from_str::<rpa::RunDefinition>(&json).unwrap();
+
+    *name = Some(run_defination.workflow.name);
+
+    path_run.pop();
+    path_run.push("Actions.log");
+
+    let Ok(actions) = fs::read_to_string(path_run) else {
+        return;
+    };
+
+    let Some(last_action) = actions.lines().last() else {
+        return;
+    };
+
+    *action = serde_json::from_str::<rpa::Action>(last_action).ok();
 }
