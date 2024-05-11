@@ -23,25 +23,32 @@
         </div>
     </template>
     
-    <template class="rpa-info-v2">
-        <div data-ref="" class="tr rpa-info-v2">
-            <div class="tr head">
-                <div class="td hostname">localhost</div>
-                <div class="td engine">Unknown</div>
-                <div class="td name">Flow name</div>
+    <template class="rpa-run">
+        <div data-ref="" class="rpa-run process">
+            <div class="head row">
+                <div class="item hostname">Unknown</div>
+                <div class="item name">{{Flow name}}</div>
             </div>
-            <div class="tr body">
-                <div class="td trigger">Attented</div>
-                <div class="td started">01/01/1997 01:00</div>
-                <div class="td parent">1234567891234567894123456879</div>
-                <div class="td action"></div>
+            <div class="body row">
+                <div class="item engine"></div>
+                <div class="item trigger"></div>
+                <div class="item started"></div>
+                <div class="item parent"></div>
+            </div>
+            <div class="action row">
+                <div class="item actionerrblock"></div>
+                <div class="item actionfunc"></div>
+                <div class="item actionindex"></div>
+                <div class="item actionname"></div>
             </div>
         </div>
     </template>
 
     <h1>RPA.Watcher</h1>
     <p class="preview"><i>This is still in preview. Not optimized for small screens</i></p>
-    <div class="view-container">
+    <div id="rpa-runs" class="run-container"></div>
+    
+    <!-- <div class="view-container">
         <div class="table thead rpa-header">
             <div class="tr">
                 <div style="width: 5% !important;" class="td engine">Engine</div>
@@ -54,7 +61,7 @@
         </div>
 
         <div class="table tbody" id="rpa-view"></div>
-    </div>
+    </div> -->
     <p class="no-info">Nothing is running</p>
 
     <div id="history-view">

@@ -117,3 +117,122 @@ div.pr {
     word-break: break-word !important;
     white-space: break-spaces !important;
 }
+
+/* New 11-05-2024 */
+.run-container {
+    width: 95vw;
+    max-width: 1800px;
+    margin: 8px auto;
+}
+
+.rpa-run {
+    border-radius: 1rem;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+.head {
+    font-size: 14pt;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+.row {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    vertical-align: middle;
+}
+
+.head.pad {
+    background-color: #0066ff;
+    color: white;
+}
+
+.head.pr {
+    background-color: #cd0b38;
+    color: white;
+}
+
+.head {
+    background-color: #cd890b;
+    color: black;
+}
+
+.head .item.hostname::after {
+    content: ' - ';
+}
+
+.row .item {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.row .item {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.item.trigger::before {
+    content: 'Trigger: ';
+}
+
+.item.trigger::after {
+    content: ', ';
+}
+
+.item.started::before {
+    content: 'Started: ';
+}
+
+.item.started::after {
+    content: ', ';
+}
+
+.item.parent::before {
+    content: 'Parent: ';
+}
+
+.item::before {
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.action .item.actionindex::before {
+    content: 'Index: ';
+}
+
+.action .item.actionindex::after {
+    content: ', ';
+}
+
+.action .item.actionfunc::before {
+    content: 'Function: ';
+}
+
+.action .item.actionfunc::after {
+    content: ', ';
+}
+
+.action .item.actionname::before {
+    content: 'Action: ';
+}
+
+.actionerrblock {
+    height: 1.5em;
+    width: 1.5em;
+}
+
+.actionerrblock.shield {
+    background-image: url('Shield.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.actionerrblock.shield::after {
+    content: ' ';
+}
