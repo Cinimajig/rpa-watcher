@@ -114,7 +114,7 @@ const appendItemsEx = (root, items, noParent) => {
                 engine.innerHTML = paLogo;
                 break;
             case 'ProcessRobot':
-                head.classList.add('pad');
+                head.classList.add('pr');
                 engine.innerHTML = prLogo;
                 break;
             default:
