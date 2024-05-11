@@ -148,6 +148,7 @@ async fn post_checkin(
         // If the item already exist, then update the timestamp.
         if let Some(rpa_data) = data.get_mut(&instance) {
             rpa_data.timestamp = now;
+            rpa_data.data.action = item.action;
         } else {
             // Otherwise create a new value and try to lookup it's name.
             let mut value = RpaValue::new(now, item);
