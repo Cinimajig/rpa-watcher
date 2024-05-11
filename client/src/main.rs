@@ -19,6 +19,12 @@ fn main() -> io::Result<Infallible> {
     let env = env::Environment::from_file_then_env();
     dbg_output(format!("<RPA.Watcher> {env:?}"));
 
+    let dump = std::env::args()
+        .skip(1)
+        .collect::<String>()
+        .to_ascii_lowercase()
+        == "dump";
+
     // Enable debug privilages.
     privilage::enable_debug_priv()?;
 
@@ -62,22 +68,37 @@ fn main() -> io::Result<Infallible> {
 
                 'name_and_action: {
                     if rpa_data.engine == RpaEngine::PowerAutomate {
-                        let Some(path_run) =
-                            process::find_log_path(&cmdline, &rpa_data.flow_id.clone().unwrap_or_default(), &rpa_data.instance)
-                        else {
+                        let Some(path_run) = process::find_log_path(
+                            &cmdline,
+                            &rpa_data.flow_id.clone().unwrap_or_default(),
+                            &rpa_data.instance,
+                        ) else {
                             break 'name_and_action;
                         };
 
                         if !path_run.is_dir() {
-                            dbg_output(format!("<RPA.Watcer> Can't find Directory: {}.", path_run.to_string_lossy()));
+                            dbg_output(format!(
+                                "<RPA.Watcer> Can't find Directory: {}.",
+                                path_run.to_string_lossy()
+                            ));
                             break 'name_and_action;
                         }
 
-                        process::get_pad_name_and_action(path_run, &mut rpa_data.name, &mut rpa_data.action);
+                        process::get_pad_name_and_action(
+                            path_run,
+                            &mut rpa_data.name,
+                            &mut rpa_data.action,
+                        );
                     }
                 }
 
                 items.push(rpa_data);
+            }
+
+            if dump {
+                println!(":::");
+                println!("{}", serde_json::to_string_pretty(&items).unwrap_or_else(|err| err.to_string()));
+                println!(":::");
             }
 
             match http::post(&env.url, &env.token, &items) {
