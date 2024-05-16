@@ -4,6 +4,11 @@
 | 1.       | $RW_PACONN  |
 | 2.       | `flow.conn` |
 
+## New as of v.0.2.1
+As of version 0.2.1, thie flow name *can* be retrieved without the use an API connection on the server. 
+This is done by reading the logpath of the current running process and will almost always work. I cases it doesn't, 
+you can still use the API to retrieve it.  
+
 To make the server display names of the Power Autmate flows, you need allow the server to lookup the names in your PA enviorment. 
 
 This is done by either using the env. variable `RW_PACONN` or creating a file next to the server, called `flow.conn` and make it contain 4 values. An example can be seen [here](#server-file)
