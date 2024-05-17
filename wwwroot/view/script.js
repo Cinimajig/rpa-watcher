@@ -11,9 +11,9 @@ const prLogo = `<img src="PRLogo.png" alt="ProcessRobot" class="image" />`;
 
 let timeZone = null;
 
-if (window.location.search.includes('word-break')) {
-    rpaView.classList.add('wordbreak');
-}
+// if (window.location.search.includes('word-break')) {
+//     rpaView.classList.add('wordbreak');
+// }
 
 if (window.location.search.includes('tz=')) {
     timeZone = window.location.search.split('tz=')[1].trim()
