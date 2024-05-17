@@ -32,8 +32,8 @@ const parseTrigger = (str) => {
 const findParent = (str) => {
     if (str) {
         for (let val of rpaData.entries()) {
-            if (val.name === str) {
-                return val.name;
+            if (val[1].parentInstance === str) {
+                return val[1].name;
             }
         }
     }
