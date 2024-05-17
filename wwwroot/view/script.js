@@ -288,6 +288,12 @@ const getRpaRunIds = () => rpaData.keys();
 const getRpaData = async () => (await fetch('/api/getrpa')).json();
 const getHistoryRpaData = async () => (await fetch('/api/gethistory?amount=50')).json()
 
+const clearCanvasEx = () => {
+    rpaData.clear();
+    historyRpaData.clear();
+    rpaRuns.innerHTML = '';
+}
+
 const clearCanvas = () => {
     rpaData.clear();
     historyRpaData.clear();
@@ -304,7 +310,7 @@ const iteratorIncludes = (item, iter) => {
 
 const timer = setInterval(() => {
     buildRpaRuns(true).catch((err) => {
-        clearCanvas();
+        clearCanvasEx();
         console.error(err);
     })
 }, intervalSeconds * 1000);
