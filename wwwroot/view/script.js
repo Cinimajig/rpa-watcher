@@ -22,10 +22,22 @@ if (window.location.search.includes('tz=')) {
 let rpaData = new Map();
 let historyRpaData = new Map();
 
-const parse_trigger = (str) => {
+const parseTrigger = (str) => {
     if (str.startsWith('Started from Console by')) {
         return str.slice(23).trim();
     }
+    return str;
+}
+
+const findParent = (str) => {
+    if (str) {
+        for (let val of rpaData.entries()) {
+            if (val.name === str) {
+                return val.name;
+            }
+        }
+    }
+
     return str;
 }
 
@@ -123,7 +135,7 @@ const appendItemsEx = (root, items, noParent) => {
         }
 
         hostname.innerText = rpa[1].computer.trim();
-        trigger.innerText = rpa[1].trigger ? parse_trigger(rpa[1].trigger.trim()) : '';
+        trigger.innerText = rpa[1].trigger ? parseTrigger(rpa[1].trigger.trim()) : '';
         flowName.innerText = rpa[1].name ? rpa[1].name.trim() : rpa[1].instance.trim();
         try {
             const dt = new Date(rpa[1].started.trim());
@@ -147,10 +159,10 @@ const appendItemsEx = (root, items, noParent) => {
         }
 
         if (!noParent && rpa[1].parentInstance) {
-            parent.innerText = rpa[1].parentInstance?.trim();
+            parent.innerText = findParent(rpa[1].parentInstance);
             let parentElement = document.querySelector(`.rpa-run.process[data-ref="${rpa[1].parentInstance}"`);
 
-            engine.innerHTML = defaultLogo;
+            // engine.innerHTML = defaultLogo;
             if (parentElement && parentElement.nextSibling) {
                 root.insertBefore(newRunItem, parentElement.nextSibling);
                 continue;
@@ -249,7 +261,7 @@ const appendItems = (root, items, noParent) => {
         }
 
         hostname.innerText = rpa[1].computer.trim();
-        trigger.innerText = rpa[1].trigger ? parse_trigger(rpa[1].trigger.trim()) : '';
+        trigger.innerText = rpa[1].trigger ? parseTrigger(rpa[1].trigger.trim()) : '';
         flowName.innerText = rpa[1].name ? rpa[1].name.trim() : rpa[1].instance.trim();
         try {
             started.innerText = new Date(rpa[1].started.trim()).toLocaleString();
