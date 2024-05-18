@@ -167,7 +167,7 @@ async fn post_checkin(
                             break;
                         };
                         match crate::pa_api::lookup_uiflow(&mut client, id).await {
-                            Ok(flow_name) => value.data.flow_id = Some(flow_name),
+                            Ok(flow_name) => value.data.name = Some(flow_name),
                             Err(err) => {
                                 if cfg!(debug_assertions) {
                                     eprintln!("Failed to find Power Automate flow. {err}");
@@ -187,7 +187,7 @@ async fn post_checkin(
                         .await
                         {
                             Ok(pr) => {
-                                value.data.flow_id = Some(pr.job_name);
+                                value.data.name = Some(pr.job_name);
                                 value.data.trigger = Some(rpa::RpaTrigger::Custom(pr.cause_text));
                             }
                             Err(err) => {
