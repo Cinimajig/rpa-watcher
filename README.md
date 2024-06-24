@@ -30,14 +30,14 @@ It consist of two components (well, three):
 - [x] <s>Add child flow support (website).</s>
 - [x] <s>Add database connection for ProcessRobot (server).</s>
 - [x] <s>Add api lookup with flow names for Power Automate (server).</s>
-- [x] Add history overview (server/website).
-- [ ] Add failed overview (server/website).
+- <s>[x] Add history overview (server/website).</s>
+- [ ] Better README/documentation.
 
 ## Building from source
 > [!NOTE]
 > It's recommended you build the client on Microsoft Windows. The server can be build on Linux and Windows.
 
-The easiest way to build it, is to run the [`Build.cmd`](Build.cmd) file. It will package everything in the target\dist folder afterwards.
+The easiest way to build it, is to run the [build](Build.cmd) script. It will package everything in the target\dist folder afterwards.
 
 Otherwise it's just the standard `cargo build --release`.
 
@@ -45,10 +45,16 @@ Otherwise it's just the standard `cargo build --release`.
 - The Rust compiler (rustc and cargo).
 - (Client) Windows SDK (If your using MSVC) or MinGW with `rc.exe` (for GCC).
 
-## Internet Information Service (IIS)
-To use the server in IIS, you need the [HttpPlatformHandler](https://www.iis.net/downloads/microsoft/httpplatformhandler) installed on the server. This allows you do redirect all traffic of a site and enable https without much configuration.
+## Implementing your own server
+If don't like the the premade site or backend server, you can just create your own in your favorite language.
 
-What you need to do, is to create `Web.config` file in the root of the hosted directory and place the server binary and the `wwwroot` folder in it.
+If you just want to create a new website/design, look [here](NewWebsite.md) (*Not documented yet*)
+If you want to create a new backend, look [here](NewServer.md)
+
+## Internet Information Service (IIS)
+If you want to use the server with IIS, you need the [HttpPlatformHandler](https://www.iis.net/downloads/microsoft/httpplatformhandler) installed on the server. This allows you do redirect all traffic of a site and enable https without much configuration.
+
+What you need to do, is to create `Web.config` file in the root of the hosted directory and place the server binary and the `wwwroot` folder in it. You also can modify the config for the site, but it's this method is easiere t omanintain/understand.
 
 **An example of `Web.config`:**
 ```xml
