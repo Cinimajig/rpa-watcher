@@ -6,25 +6,44 @@ const historyViewContainer = document.querySelector('#history-view');
 const info = document.querySelector('.no-info');
 
 const defaultLogo = `<img src="parent.svg" alt="Unknown engine or child flow" class="image" />`;
-const paLogo = `<img src="PALogo.png" alt="Power Automate" class="image" />`;
-const prLogo = `<img src="PRLogo.png" alt="ProcessRobot" class="image" />`;
-
+let paLogo = `<img src="PALogo.png" alt="Power Automate" class="image" />`;
+let prLogo = `<img src="PRLogo.png" alt="ProcessRobot" class="image" />`;
 let timeZone = null;
 
-// if (window.location.search.includes('word-break')) {
-//     rpaView.classList.add('wordbreak');
-// }
+const parseBool = (str) => {
+    return str.trim().toLowerCase() == 'true'
+}
 
-if (window.location.search.includes('tz=')) {
-    timeZone = window.location.search.split('tz=')[1].trim()
+for (let param of window.location.search.substring(1).split('&')) {
+    const [name, value] = param.split('=');
+
+    switch (name) {
+        case 'tz':
+            timeZone = value.trim();
+            break;
+        case 'noColor':
+            if (value ? parseBool(value) : true) {
+                prLogo = `<img src="PRLogo_GS.png" alt="ProcessRobot" class="image" />`;
+                paLogo = `<img src="PALogo_GS.png" alt="Power Automate" class="image" />`;
+            }
+        case 'no-red':
+            if (value ? parseBool(value) : true) {
+                prLogo = `<img src="PRLogo_GS.png" alt="ProcessRobot" class="image" />`;
+            }
+        case 'no-blue':
+            if (value ? parseBool(value) : true) {
+                paLogo = `<img src="PALogo_GS.png" alt="Power Automate" class="image" />`;
+            }
+    }
 }
 
 let rpaData = new Map();
 let historyRpaData = new Map();
 
 const parseTrigger = (str) => {
-    if (str.startsWith('Started from Console by')) {
-        return str.slice(23).trim();
+    const prefix = 'Started from Console by';
+    if (str.startsWith(prefix)) {
+        return str.slice(prefix.length).trim();
     }
     return str;
 }
@@ -32,7 +51,7 @@ const parseTrigger = (str) => {
 const findParent = (str) => {
     if (str) {
         for (let val of rpaData.entries()) {
-            if (val[1].parentInstance === str) {
+            if (val[1].instance === str) {
                 return val[1].name;
             }
         }
@@ -221,7 +240,7 @@ const buildHistory = async (clear) => {
     }
 
     appendItems(rpaHistoryView, historyRpaData, true);
-    
+
     if (historyRpaData.size === 0) {
         historyViewContainer.style.display = 'none';
     } else {
