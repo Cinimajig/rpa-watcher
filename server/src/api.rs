@@ -1,13 +1,12 @@
 use axum::{
     extract::{Query, State},
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
     routing::{get, post},
     Json, Router,
 };
 use rpa::RpaData;
 use std::{
-    collections::{HashMap, VecDeque},
-    sync::Arc,
+    collections::{HashMap, VecDeque}, sync::Arc
 };
 use tokio::{sync::RwLock, time::Instant};
 
@@ -57,6 +56,7 @@ impl ApiQuery {
 
 #[derive(Clone)]
 pub struct GlobalState {
+    pub token: Arc<Box<str>>,
     pub kill_flag: Arc<RwLock<bool>>,
     pub prdb: Option<Arc<RwLock<crate::db::Database>>>,
     pub paapi: Option<Arc<RwLock<crate::pa_api::PowerAutomateAPI>>>,
@@ -75,31 +75,58 @@ pub fn router(database: GlobalState) -> Router {
         .fallback(crate::fallback)
 }
 
+fn authenticated(headers: &HeaderMap, token: &str) -> Result<(), StatusCode> {
+    let Some(api_token) = headers.get("Api-Token") else {
+        if token.is_empty() {
+            #[cfg(debug_assertions)]
+            println!("No token required");
+            return Ok(());
+        }
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    
+    #[cfg(debug_assertions)]
+    {
+        println!("Header(Api-Token: {api_token:?})\n{:?}", api_token.as_bytes());
+        println!("State(Api-Token: {:?})\n{:?}", token, token.as_bytes());
+    }
+
+    // Using bytes for speed.
+    if api_token.as_bytes() != token.as_bytes() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    Ok(())
+}
+
 async fn get_failed_rpadata(
-    // headers: HeaderMap,
+    headers: HeaderMap,
     State(state): State<GlobalState>,
-) -> Json<Vec<RpaData>> {
+) -> Result<Json<Vec<RpaData>>, StatusCode> {
+    authenticated(&headers, &state.token)?;
     let data = state.failed_rpa.read().await;
-    Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
+    Ok(Json(data.iter().map(|(_k, v)| v.data.clone()).collect()))
 }
 
 async fn get_rpadata(
-    // headers: HeaderMap,
+    headers: HeaderMap,
     State(state): State<GlobalState>,
-) -> Json<Vec<RpaData>> {
+) -> Result<Json<Vec<RpaData>>, StatusCode> {
+    authenticated(&headers, &state.token)?;
     let data = state.rpa.read().await;
 
     #[cfg(debug_assertions)]
     println!("Sending {} items", data.len());
 
-    Json(data.iter().map(|(_k, v)| v.data.clone()).collect())
+    Ok(Json(data.iter().map(|(_k, v)| v.data.clone()).collect()))
 }
 
 async fn get_history_rpadata(
-    // headers: HeaderMap,
+    headers: HeaderMap,
     Query(params): Query<ApiQuery>,
     State(state): State<GlobalState>,
-) -> Json<Vec<RpaData>> {
+) -> Result<Json<Vec<RpaData>>, StatusCode> {
+    authenticated(&headers, &state.token)?;
     let history = state.history_rpa.read().await;
     let slices = history.as_slices();
 
@@ -121,19 +148,20 @@ async fn get_history_rpadata(
         history.len()
     );
 
-    Json(buffer)
+    Ok(Json(buffer))
 }
 
 async fn post_checkin(
-    // headers: HeaderMap,
+    headers: HeaderMap,
     State(state): State<GlobalState>,
     Json(payload): Json<Vec<RpaData>>,
-) -> StatusCode {
+) -> Result<(), StatusCode> {
+    authenticated(&headers, &state.token)?;
     #[cfg(debug_assertions)]
     println!("Recieved payload: {:?}", payload);
 
     if payload.is_empty() {
-        return StatusCode::BAD_REQUEST;
+        return Err(StatusCode::BAD_REQUEST);
     }
 
     #[cfg(debug_assertions)]
@@ -204,7 +232,7 @@ async fn post_checkin(
         }
     }
 
-    StatusCode::OK
+    Ok(()) // StatusCode::OK
 }
 
 pub async fn cleanup_timer(state: GlobalState) {
