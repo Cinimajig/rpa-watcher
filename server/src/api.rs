@@ -112,7 +112,6 @@ async fn get_rpadata(
     headers: HeaderMap,
     State(state): State<GlobalState>,
 ) -> Result<Json<Vec<RpaData>>, StatusCode> {
-    authenticated(&headers, &state.token)?;
     let data = state.rpa.read().await;
 
     #[cfg(debug_assertions)]
@@ -126,7 +125,6 @@ async fn get_history_rpadata(
     Query(params): Query<ApiQuery>,
     State(state): State<GlobalState>,
 ) -> Result<Json<Vec<RpaData>>, StatusCode> {
-    authenticated(&headers, &state.token)?;
     let history = state.history_rpa.read().await;
     let slices = history.as_slices();
 
