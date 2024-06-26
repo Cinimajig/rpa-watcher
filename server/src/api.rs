@@ -100,16 +100,15 @@ fn authenticated(headers: &HeaderMap, token: &str) -> Result<(), StatusCode> {
 }
 
 async fn get_failed_rpadata(
-    headers: HeaderMap,
+    // headers: HeaderMap,
     State(state): State<GlobalState>,
 ) -> Result<Json<Vec<RpaData>>, StatusCode> {
-    authenticated(&headers, &state.token)?;
     let data = state.failed_rpa.read().await;
     Ok(Json(data.iter().map(|(_k, v)| v.data.clone()).collect()))
 }
 
 async fn get_rpadata(
-    headers: HeaderMap,
+    // headers: HeaderMap,
     State(state): State<GlobalState>,
 ) -> Result<Json<Vec<RpaData>>, StatusCode> {
     let data = state.rpa.read().await;
@@ -121,7 +120,7 @@ async fn get_rpadata(
 }
 
 async fn get_history_rpadata(
-    headers: HeaderMap,
+    // headers: HeaderMap,
     Query(params): Query<ApiQuery>,
     State(state): State<GlobalState>,
 ) -> Result<Json<Vec<RpaData>>, StatusCode> {
