@@ -4,7 +4,7 @@ To create your own server, you really only need to recreate the datatypes, that 
 The client expects an endpoint to send all the currently running RPA-processes to.
 
 Here is an description of what the JSON data looks like:
-```json
+```
 [
     {
         "engine": "string",
@@ -19,7 +19,7 @@ Here is an description of what the JSON data looks like:
     }
 ]
 ```
-```json
+```
 // Action:
 {
     "name": "string",

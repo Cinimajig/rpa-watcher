@@ -23,6 +23,8 @@ async fn main() -> anyhow::Result<()> {
         println!("{name}={val}");
     }
 
+    let token = env::var("RW_TOKEN").unwrap_or_default();
+
     let config::PRConfig {
         http_port,
         db_conn_str,
@@ -52,10 +54,9 @@ async fn main() -> anyhow::Result<()> {
     // Global application state.
     // This is share with each api request and the cleanup routine.
     let global_state = api::GlobalState {
-        token: Arc::new("".into()),
+        token: Arc::new(token.into()),
         kill_flag: Arc::new(RwLock::new(false)),
-        prdb,
-        paapi,
+        prdb, paapi,
         rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
         failed_rpa: Arc::new(RwLock::new(HashMap::with_capacity(api::DEFAULT_SIZE))),
         history_rpa: Arc::new(RwLock::new(VecDeque::with_capacity(api::HISTORY_LIMIT))),
