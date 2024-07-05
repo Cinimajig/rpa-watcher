@@ -9,6 +9,8 @@ const defaultLogo = `<img src="parent.svg" alt="Unknown engine or child flow" cl
 let paLogo = `<img src="PALogo.png" alt="Power Automate" class="image" />`;
 let prLogo = `<img src="PRLogo.png" alt="ProcessRobot" class="image" />`;
 let timeZone = null;
+let noBlue = false;
+let noRed = false;
 
 const parseBool = (str) => {
     return str.trim().toLowerCase() == 'true'
@@ -21,19 +23,26 @@ for (let param of window.location.search.substring(1).split('&')) {
         case 'tz':
             timeZone = value.trim();
             break;
-        case 'noColor':
+        case 'no-color':
             if (value ? parseBool(value) : true) {
                 prLogo = `<img src="PRLogo_GS.png" alt="ProcessRobot" class="image" />`;
                 paLogo = `<img src="PALogo_GS.png" alt="Power Automate" class="image" />`;
+                noRed = true;
+                noBlue = true;
             }
+            break;
         case 'no-red':
             if (value ? parseBool(value) : true) {
                 prLogo = `<img src="PRLogo_GS.png" alt="ProcessRobot" class="image" />`;
+                noRed = true;
             }
+            break;
         case 'no-blue':
             if (value ? parseBool(value) : true) {
                 paLogo = `<img src="PALogo_GS.png" alt="Power Automate" class="image" />`;
+                noBlue = true;
             }
+            break;
     }
 }
 
@@ -141,11 +150,11 @@ const appendItemsEx = (root, items, noParent) => {
 
         switch (rpa[1].engine) {
             case 'Power Automate':
-                head.classList.add('pad');
+                if (!noBlue) head.classList.add('pad');
                 engine.innerHTML = paLogo;
                 break;
             case 'ProcessRobot':
-                head.classList.add('pr');
+                if (!noRed) head.classList.add('pr');
                 engine.innerHTML = prLogo;
                 break;
             default:

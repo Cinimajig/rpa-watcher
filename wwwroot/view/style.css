@@ -88,7 +88,7 @@ p.preview {
 .tbody .tr:last-of-type > .td:last-of-type {
     border-bottom-right-radius: 1rem;
 }
-
+/* 
 div.pad {
     background-color: #0066ff !important;
     color: white;
@@ -102,7 +102,7 @@ div.pad {
 div.pr {
     background-color: #cd0b38 !important;
     color: white;
-}
+} */
 
 .tbody .tr:nth-child(2n) .ptr {
     background-color: #b60932 !important;
@@ -160,8 +160,8 @@ div.pr {
 }
 
 .head {
-    background-color: #cd890b;
-    color: black;
+    background-color: #666666;
+    color: white;
 }
 
 .head .item.hostname::after {
