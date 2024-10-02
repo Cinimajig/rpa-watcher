@@ -178,6 +178,14 @@ div.pr {
     vertical-align: middle;
 }
 
+.child::before {
+    content: 'Subflow: ';
+}
+
+.child::after {
+    content: ', ';
+}
+
 .item.trigger::before {
     content: 'Trigger: ';
 }
@@ -201,6 +209,14 @@ div.pr {
 .item::before {
     font-style: italic;
     color: rgba(0, 0, 0, 0.5);
+}
+
+.action .item.flowname::before {
+    content: 'Flow: '
+}
+
+.action .item.flowname::after {
+    content: ', '
 }
 
 .action .item.actionindex::before {

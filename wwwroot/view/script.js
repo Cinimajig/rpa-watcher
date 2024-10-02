@@ -5,6 +5,7 @@ const rpaHistoryView = document.querySelector('#rpa-history');
 const historyViewContainer = document.querySelector('#history-view');
 const info = document.querySelector('.no-info');
 
+const subflow = `<img src="Down_Right.svg" alt="Child flow" class="image" />`;
 const defaultLogo = `<img src="parent.svg" alt="Unknown engine or child flow" class="image" />`;
 let paLogo = `<img src="PALogo.png" alt="Power Automate" class="image" />`;
 let prLogo = `<img src="PRLogo.png" alt="ProcessRobot" class="image" />`;
@@ -80,10 +81,11 @@ const buildRpaRuns = async (clear) => {
         rpaData.set(data[i].instance, data[i]);
     }
 
-    for (let el of rpaRuns.querySelectorAll('.rpa-run.process')) {
+    for (let el of rpaRuns.querySelectorAll('.process')) {
         let attr = el.getAttribute('data-ref');
         if (!iteratorIncludes(attr, rpaData.keys())) {
-            rpaRuns.querySelector(`.rpa-run.process[data-ref="${attr}"`).remove();
+            let item = rpaRuns.querySelector(`.process[data-ref="${attr}"]`);
+            if (item) { item.remove(); }
         }
     }
 
@@ -101,7 +103,7 @@ const buildRpaRuns = async (clear) => {
 const appendItemsEx = (root, items, noParent) => {
     // Changes the current action, in case it has changed.
     for (let rpa of items) {
-        const currentFlow = root.querySelector(`.rpa-run.process[data-ref="${rpa[0]}"`);
+        const currentFlow = document.querySelector(`.process[data-ref="${rpa[0]}"]`);
         if (currentFlow) {
             if (!rpa[1].action) {
                 continue;
@@ -191,8 +193,20 @@ const appendItemsEx = (root, items, noParent) => {
             let parentElement = document.querySelector(`.rpa-run.process[data-ref="${rpa[1].parentInstance}"`);
 
             // engine.innerHTML = defaultLogo;
-            if (parentElement && parentElement.nextSibling) {
-                root.insertBefore(newRunItem, parentElement.nextSibling);
+            // if (parentElement && parentElement.nextSibling) {
+            //     root.insertBefore(newRunItem, parentElement.nextSibling);
+            //     continue;
+            // }
+            if (parentElement) {
+                head.remove();
+                started.remove();
+
+                newRunItem.style.boxShadow = 'none';
+                newRunItem.style.marginBottom = '';
+                engine.innerHTML = subflow;
+                trigger.innerText = flowName.innerText;
+                trigger.className = 'item child';
+                parentElement.appendChild(newRunItem);
                 continue;
             }
         }
@@ -215,7 +229,8 @@ const buildRpaConvas = async (clear) => {
     for (let el of rpaView.querySelectorAll('.tr.rpa-info')) {
         let attr = el.getAttribute('data-ref');
         if (!iteratorIncludes(attr, rpaData.keys())) {
-            rpaView.querySelector(`.tr.rpa-info[data-ref="${attr}"`).remove();
+            let item = rpaView.querySelector(`.tr.rpa-info[data-ref="${attr}"]`);
+            if (item) { item.remove(); }
         }
     }
 
@@ -244,7 +259,8 @@ const buildHistory = async (clear) => {
     for (let el of rpaHistoryView.querySelectorAll('.tr.rpa-info')) {
         let attr = el.getAttribute('data-ref');
         if (!iteratorIncludes(attr, historyRpaData.keys())) {
-            rpaHistoryView.querySelector(`.tr.rpa-info[data-ref="${attr}"`).remove();
+            let item = rpaHistoryView.querySelector(`.tr.rpa-info[data-ref="${attr}"]`);
+            if (item) { item.remove(); }
         }
     }
 
