@@ -6,7 +6,8 @@ use axum::{
 };
 use rpa::RpaData;
 use std::{
-    collections::{HashMap, VecDeque}, sync::Arc
+    collections::{HashMap, VecDeque},
+    sync::Arc,
 };
 use tokio::{sync::RwLock, time::Instant};
 
@@ -68,6 +69,7 @@ pub struct GlobalState {
 pub fn router(database: GlobalState) -> Router {
     Router::new()
         .route("/getrpa", get(get_rpadata))
+        .route("/gettemplate", get(get_rpadata_template))
         .route("/getfailed", get(get_failed_rpadata))
         .route("/gethistory", get(get_history_rpadata))
         .route("/checkin", post(post_checkin))
@@ -84,10 +86,13 @@ fn authenticated(headers: &HeaderMap, token: &str) -> Result<(), StatusCode> {
         }
         return Err(StatusCode::UNAUTHORIZED);
     };
-    
+
     #[cfg(debug_assertions)]
     {
-        println!("Header(Api-Token: {api_token:?})\n{:?}", api_token.as_bytes());
+        println!(
+            "Header(Api-Token: {api_token:?})\n{:?}",
+            api_token.as_bytes()
+        );
         println!("State(Api-Token: {:?})\n{:?}", token, token.as_bytes());
     }
 
@@ -280,4 +285,62 @@ pub async fn cleanup_timer(state: GlobalState) {
             history.pop_back();
         }
     }
+}
+
+async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
+    use rpa::{Action, DateTime, RpaEngine::*, RpaTrigger::*};
+
+    #[cfg(debug_assertions)]
+    println!("Sending test data");
+
+    Ok(Json(vec![
+        RpaData {
+            engine: PowerAutomate,
+            computer: "localhost".to_string(),
+            started: Some(DateTime::default()),
+            instance: "Instance A".to_string(),
+            name: Some("Flow A".to_string()),
+            action: Some(Action {
+                name: "Nothing".to_string(),
+                function_name: "Main".to_string(),
+                index: 1,
+                inside_error_handling: false,
+            }),
+            trigger: Some(Unattended),
+            flow_id: Some("Flow A".to_string()),
+            parent_instance: None,
+        },
+        RpaData {
+            engine: PowerAutomate,
+            computer: "localhost".to_string(),
+            started: Some(DateTime::default()),
+            instance: "Instance B".to_string(),
+            name: Some("Flow B".to_string()),
+            action: Some(Action {
+                name: "Nothing".to_string(),
+                function_name: "Main".to_string(),
+                index: 1,
+                inside_error_handling: false,
+            }),
+            trigger: Some(Unattended),
+            flow_id: Some("Flow B".to_string()),
+            parent_instance: Some("Flow A".to_string()),
+        },
+        RpaData {
+            engine: PowerAutomate,
+            computer: "localhost".to_string(),
+            started: Some(DateTime::default()),
+            instance: "Instance C".to_string(),
+            name: Some("Flow C".to_string()),
+            action: Some(Action {
+                name: "Nothing".to_string(),
+                function_name: "Main".to_string(),
+                index: 1,
+                inside_error_handling: false,
+            }),
+            trigger: Some(Unattended),
+            flow_id: Some("Flow C".to_string()),
+            parent_instance: Some("Flow B".to_string()),
+        }
+    ]))
 }
