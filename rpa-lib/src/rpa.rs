@@ -224,10 +224,10 @@ pub struct Workflow {
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Default))]
 pub struct Action {
-    name: String,
-    function_name: String,
-    index: u32,
-    inside_error_handling: bool,
+    pub name: String,
+    pub function_name: String,
+    pub index: u32,
+    pub inside_error_handling: bool,
 }
 
 fn find_parameter<'a>(cmdline_lc: &'a str, param: &'a str, length: usize) -> Option<&'a str> {
