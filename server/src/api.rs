@@ -293,11 +293,15 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
     #[cfg(debug_assertions)]
     println!("Sending test data");
 
+    let base_time = DateTime::from_timestamp(1431648000, 0).unwrap_or_default();
+    let time_1 = DateTime::from_timestamp(1431648000 + 100000, 0).unwrap_or_default();
+    let time_2 = DateTime::from_timestamp(1431648000 + 200000, 0).unwrap_or_default();
+
     Ok(Json(vec![
         RpaData {
             engine: PowerAutomate,
             computer: "localhost".to_string(),
-            started: Some(DateTime::default()),
+            started: Some(base_time),
             instance: "Instance A".to_string(),
             name: Some("Flow A".to_string()),
             action: Some(Action {
@@ -313,7 +317,7 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
         RpaData {
             engine: PowerAutomate,
             computer: "localhost".to_string(),
-            started: Some(DateTime::default()),
+            started: Some(time_1),
             instance: "Instance B".to_string(),
             name: Some("Flow B".to_string()),
             action: Some(Action {
@@ -324,12 +328,12 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
             }),
             trigger: Some(Unattended),
             flow_id: Some("Flow B".to_string()),
-            parent_instance: Some("Flow A".to_string()),
+            parent_instance: Some("Instance A".to_string()),
         },
         RpaData {
             engine: PowerAutomate,
             computer: "localhost".to_string(),
-            started: Some(DateTime::default()),
+            started: Some(time_2),
             instance: "Instance C".to_string(),
             name: Some("Flow C".to_string()),
             action: Some(Action {
@@ -340,7 +344,7 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
             }),
             trigger: Some(Unattended),
             flow_id: Some("Flow C".to_string()),
-            parent_instance: Some("Flow B".to_string()),
+            parent_instance: Some("Instance B".to_string()),
         }
     ]))
 }

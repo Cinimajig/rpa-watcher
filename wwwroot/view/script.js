@@ -89,7 +89,8 @@ const buildRpaRuns = async (clear) => {
         }
     }
 
-    appendItemsEx(rpaRuns, [...rpaData.entries()].sort((a, b) => a[1].parentInstance !== null), false);
+    // OLD: a[1].parentInstance !== null
+    appendItemsEx(rpaRuns, [...rpaData.entries()].sort((a, b) => a[1].started > b[1].started), false);
 
     if (rpaData.size === 0) {
         info.style.display = '';
@@ -188,10 +189,12 @@ const appendItemsEx = (root, items, noParent) => {
             action.style.display = 'none';
         }
 
+        
+
         if (!noParent && rpa[1].parentInstance) {
             parent.innerText = findParent(rpa[1].parentInstance);
-            let parentElement = document.querySelector(`.rpa-run.process[data-ref="${rpa[1].parentInstance}"`);
-
+            let parentElement = document.querySelector(`.process[data-ref="${rpa[1].parentInstance}"]`);
+            
             // engine.innerHTML = defaultLogo;
             // if (parentElement && parentElement.nextSibling) {
             //     root.insertBefore(newRunItem, parentElement.nextSibling);
