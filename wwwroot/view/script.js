@@ -90,7 +90,7 @@ const buildRpaRuns = async (clear) => {
     }
 
     // OLD: a[1].parentInstance !== null
-    appendItemsEx(rpaRuns, [...rpaData.entries()].sort((a, b) => a[1].started > b[1].started), false);
+    appendItemsEx(rpaRuns, [...rpaData.entries()].sort((a, b) => a[1].started > b[1].started ? 1 : -1), false);
 
     if (rpaData.size === 0) {
         info.style.display = '';
