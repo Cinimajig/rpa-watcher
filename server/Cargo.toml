@@ -1,18 +1,18 @@
 [package]
 name = "rpa-watcher-srv"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = { version = "0.7.5" }
+axum = { version = "0.8.1" }
 serde = "1.0.197"
 serde_json = "1.0.116"
 rpa = { path = "../rpa-lib" }
 tokio = { version = "1.37.0", features = ["full"] }
 tokio-util = { version = "0.7.10", features = ["compat"] }
-tower-http = { version = "0.5.2", features = ["fs"] }
+tower-http = { version = "0.6.2", features = ["fs"] }
 tiberius = { version = "0.12.2", features = ["tokio", "sql-browser-tokio"] }
 reqwest = { version = "0.12.3", features = ["json"] }
 anyhow = "1.0.82"
