@@ -76,6 +76,7 @@ pub struct RpaData {
     pub trigger: Option<RpaTrigger>,
     pub flow_id: Option<String>,
     pub parent_instance: Option<String>,
+    pub notification: Option<String>,
 }
 
 impl RpaData {
@@ -201,6 +202,7 @@ impl RpaData {
             parent_instance,
             trigger,
             started,
+            notification: None,
             // azure_data,
         })
     }
@@ -277,6 +279,7 @@ mod tests {
             started: None,
             name: Some("Test flow".to_string()),
             action: None,
+            notification: Some("Notification".to_string()),
         };
 
         let json = serde_json::to_string_pretty(&data);

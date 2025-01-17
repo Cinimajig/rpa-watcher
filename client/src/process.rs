@@ -102,7 +102,7 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> 
 pub fn get_name(handle: HANDLE) -> windows::core::Result<String> {
     unsafe {
         // Opens the token on the process.
-        let mut token = SafeHandle::<true>(HANDLE(0));
+        let mut token = SafeHandle::<true>(HANDLE(0 as _));
         OpenProcessToken(handle, TOKEN_QUERY, &mut *token)?;
 
         // Retrieves the size of the user information. Error will be ignored.
@@ -120,12 +120,12 @@ pub fn get_name(handle: HANDLE) -> windows::core::Result<String> {
         // Retrieves the size of the username. Error will be ignored.
         let mut user_size = 0;
         let mut domain_size = 0;
-        LookupAccountSidW(None, (*token_user).User.Sid, PWSTR::null(), &mut user_size, PWSTR::null(), &mut domain_size, &mut sid_use).unwrap_or_default();
+        LookupAccountSidW(None, (*token_user).User.Sid, None, &mut user_size, None, &mut domain_size, &mut sid_use).unwrap_or_default();
 
         // Retrieves the username.
         let mut username = vec![0u16; user_size as usize + 1];
         let mut domain = vec![0u16; domain_size as usize + 1];
-        LookupAccountSidW(None, (*token_user).User.Sid, PWSTR::from_raw(username.as_mut_ptr()), &mut user_size, PWSTR::from_raw(domain.as_mut_ptr()), &mut domain_size, &mut sid_use)?;
+        LookupAccountSidW(None, (*token_user).User.Sid, Some(PWSTR::from_raw(username.as_mut_ptr())), &mut user_size, Some(PWSTR::from_raw(domain.as_mut_ptr())), &mut domain_size, &mut sid_use)?;
 
         // Converts to a string.
         Ok(String::from_utf16_lossy(&username[..user_size as usize]))

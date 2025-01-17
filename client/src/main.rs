@@ -4,6 +4,7 @@ mod handles;
 mod http;
 mod privilage;
 mod process;
+mod notification;
 
 use dbg::*;
 use rpa::*;
@@ -92,6 +93,8 @@ fn main() -> io::Result<Infallible> {
                     }
                 }
 
+                rpa_data.notification = notification::read_text(&env.notification);
+
                 items.push(rpa_data);
             }
 
@@ -120,7 +123,7 @@ fn get_hostname() -> Result<String> {
     unsafe {
         let mut buffer = [0u16; MAX_COMPUTERNAME_LENGTH as usize + 1];
         let mut size = MAX_COMPUTERNAME_LENGTH + 1;
-        GetComputerNameW(PWSTR::from_raw(buffer.as_mut_ptr()), &mut size)?;
+        GetComputerNameW(Some(PWSTR::from_raw(buffer.as_mut_ptr())), &mut size)?;
 
         Ok(String::from_utf16_lossy(&buffer[..size as usize]))
     }

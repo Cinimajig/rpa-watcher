@@ -15,7 +15,7 @@ impl<const SUPRESS: bool> Drop for SafeHandle<SUPRESS> {
             if !self.0.is_invalid() {
                 CloseHandle(self.0).unwrap_or_default();
                 if !SUPRESS {
-                    println!("[!] SafeHandle::drop({})", self.0 .0);
+                    println!("[!] SafeHandle::drop({})", self.0.0 as isize);
                 }
             }
         }

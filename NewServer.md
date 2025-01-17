@@ -15,7 +15,8 @@ Here is an description of what the JSON data looks like:
         "action": null or Action,
         "trigger": null or "string",
         "flowId": null or "string",
-        "parentInstance": null or "string"
+        "parentInstance": null or "string",
+        "notification": null or "string"
     }
 ]
 ```

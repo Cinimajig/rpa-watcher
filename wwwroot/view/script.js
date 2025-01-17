@@ -106,7 +106,7 @@ const appendItemsEx = (root, items, noParent) => {
     for (let rpa of items) {
         const currentFlow = document.querySelector(`.process[data-ref="${rpa[0]}"]`);
         if (currentFlow) {
-            if (!rpa[1].action) {
+            if (!rpa[1].action && !rpa[1].notification) {
                 continue;
             }
 
@@ -114,6 +114,14 @@ const appendItemsEx = (root, items, noParent) => {
             const actionFunc = currentFlow.querySelector('.action .actionfunc');
             const actionIndex = currentFlow.querySelector('.action .actionindex');
             const actionName = currentFlow.querySelector('.action .actionname');
+
+            // Notification.
+            const notification = currentFlow.querySelector('.notification');
+            if (rpa[1].notification) {
+                notification.innerText = rpa[1].notification;
+            } else {
+                notification.innerText = '';
+            }
 
             // Error block.
             rpa[1].action.insideErrorHandling ? errorBlock.classList.add('shield') : errorBlock.classList.remove('shield');
@@ -150,6 +158,8 @@ const appendItemsEx = (root, items, noParent) => {
         const actionFunc = newRunItem.querySelector('.item.actionfunc');
         const actionIndex = newRunItem.querySelector('.item.actionindex');
         const actionName = newRunItem.querySelector('.item.actionname');
+        
+        const notification = newRunItem.querySelector('.notification');
 
         switch (rpa[1].engine) {
             case 'Power Automate':
@@ -179,6 +189,13 @@ const appendItemsEx = (root, items, noParent) => {
             started.innerText = '';
         }
 
+        // Notification.
+        if (rpa[1].notification) {
+            notification.innerText = rpa[1].notification;
+        } else {
+            notification.innerText = '';
+        }
+        
         if (rpa[1].action) {
             rpa[1].action.insideErrorHandling ? errorBlock.classList.add('shield') : errorBlock.classList.remove('shield');
             actionFunc.innerText = rpa[1].action.functionName;
@@ -188,9 +205,7 @@ const appendItemsEx = (root, items, noParent) => {
         } else {
             action.style.display = 'none';
         }
-
         
-
         if (!noParent && rpa[1].parentInstance) {
             parent.innerText = findParent(rpa[1].parentInstance);
             let parentElement = document.querySelector(`.process[data-ref="${rpa[1].parentInstance}"]`);

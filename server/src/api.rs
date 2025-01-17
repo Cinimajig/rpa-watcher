@@ -179,6 +179,7 @@ async fn post_checkin(
         if let Some(rpa_data) = data.get_mut(&instance) {
             rpa_data.timestamp = now;
             rpa_data.data.action = item.action;
+            rpa_data.data.notification = item.notification;
         } else {
             // Otherwise create a new value and try to lookup it's name.
             let mut value = RpaValue::new(now, item);
@@ -313,6 +314,7 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
             trigger: Some(Unattended),
             flow_id: Some("Flow A".to_string()),
             parent_instance: None,
+            notification: None,
         },
         RpaData {
             engine: PowerAutomate,
@@ -329,6 +331,7 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
             trigger: Some(Unattended),
             flow_id: Some("Flow B".to_string()),
             parent_instance: Some("Instance A".to_string()),
+            notification: None,
         },
         RpaData {
             engine: PowerAutomate,
@@ -345,6 +348,7 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
             trigger: Some(Unattended),
             flow_id: Some("Flow C".to_string()),
             parent_instance: Some("Instance B".to_string()),
+            notification: None,
         }
     ]))
 }
