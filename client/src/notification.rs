@@ -50,9 +50,9 @@ fn read_window_text(hieraci: &[String]) -> Option<String> {
         let handle = find_window_recursive(hieraci)?;
         // Retrieves text size.
         let size = SendMessageW(handle, WM_GETTEXTLENGTH, None, None).0 as usize;
-        let mut buffer = vec![0u16; size];
+        let mut buffer = vec![0u16; size + 1];
         // Retrieves the text.
-        let size = SendMessageW(handle, WM_GETTEXT, Some(WPARAM(size)), Some(LPARAM(buffer.as_mut_ptr() as _))).0 as usize;
+        let size = SendMessageW(handle, WM_GETTEXT, Some(WPARAM(buffer.len())), Some(LPARAM(buffer.as_mut_ptr() as _))).0 as usize;
         Some(String::from_utf16_lossy(&buffer[..size]))
     }
 }
