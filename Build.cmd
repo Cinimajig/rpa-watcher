@@ -3,6 +3,7 @@ SETLOCAL EnableDelayedExpansion
 
 :: BUILDING CLIENT AND SERVER.
 cargo build --release
+cargo build --release -F windows --bin rpa-watcherw
 IF %ERRORLEVEL% NEQ 0 GOTO RETURN_LAST_ERROR
 
 RD /Q /S target\dist > NUL

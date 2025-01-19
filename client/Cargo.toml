@@ -3,7 +3,19 @@ name = "rpa-watcher"
 version = "0.2.4"
 edition = "2021"
 
+[features]
+windows = []
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "rpa-watcher"
+path = "src/main.rs"
+required-features = ["windows"]
+
+[[bin]]
+name = "rpa-watcherw"
+path = "src/main.rs"
 
 [dependencies]
 # curl = "0.4.44"

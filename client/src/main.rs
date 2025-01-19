@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "windows", windows_subsystem = "windows")]
 mod dbg;
 mod env;
 mod handles;

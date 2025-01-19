@@ -96,6 +96,43 @@
             },
             "args": [],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'rpa-watcherw'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=rpa-watcherw",
+                    "--package=rpa-watcher"
+                ],
+                "filter": {
+                    "name": "rpa-watcherw",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'rpa-watcherw'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=rpa-watcherw",
+                    "--package=rpa-watcher"
+                ],
+                "filter": {
+                    "name": "rpa-watcherw",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
