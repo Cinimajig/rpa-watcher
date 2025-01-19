@@ -63,10 +63,8 @@ async fn main() -> anyhow::Result<()> {
     };
 
     let app = Router::new()
-        .nest_service(
-            "/",
-            ServeDir::new("wwwroot").not_found_service(fallback.into_service()),
-        )
+        // .nest_service("/", ServeDir::new("wwwroot").not_found_service(fallback.into_service()))
+        .fallback_service(ServeDir::new("wwwroot").not_found_service(fallback.into_service()))
         .nest("/api", api::router(global_state.clone()));
 
     let listener = tokio::net::TcpListener::bind(("0.0.0.0", http_port)).await?;
