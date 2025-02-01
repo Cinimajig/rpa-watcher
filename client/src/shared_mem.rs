@@ -84,6 +84,7 @@ impl SharedMemMap {
 impl Drop for SharedMemMap {
     fn drop(&mut self) {
         unsafe {
+            let _ = UnmapViewOfFile(self.ptr);
             let _ = CloseHandle(self.handle);
         }
     }
