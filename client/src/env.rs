@@ -2,6 +2,8 @@
 
 use std::{env, fs, io, path::PathBuf, str::FromStr};
 
+use crate::shared_mem::SharedMemMap;
+
 const DEFAULT_URL: &str = "http://localhost/api/checkin";
 const DEFAULT_TOKEN: &str = "";
 const DEFAULT_NOTIFICATION: NotificationType = NotificationType::None;
@@ -27,7 +29,11 @@ impl Environment {
     pub fn from_file_then_env() -> Self {
         let mut this = Self::from_file().unwrap_or_default();
 
-        match (env::var("RW_URL"), env::var("RW_TOKEN"), env::var("RW_NOTIFY")) {
+        match (
+            env::var("RW_URL"),
+            env::var("RW_TOKEN"),
+            env::var("RW_NOTIFY"),
+        ) {
             (Ok(url), Ok(token), Ok(notification)) => {
                 this.url = url;
                 this.token = token;
@@ -46,15 +52,15 @@ impl Environment {
             (Ok(url), Ok(token), Err(_)) => {
                 this.url = url;
                 this.token = token;
-            },
+            }
             (Ok(url), Err(_), Ok(notification)) => {
                 this.url = url;
                 this.notification = notification.parse().unwrap_or_default();
-            },
+            }
             (Err(_), Ok(token), Ok(notification)) => {
                 this.token = token;
                 this.notification = notification.parse().unwrap_or_default();
-            },
+            }
         }
 
         this
@@ -63,9 +69,15 @@ impl Environment {
     pub fn from_env() -> Result<Self, env::VarError> {
         let url = env::var("RW_URL").unwrap_or(DEFAULT_URL.to_string());
         let token = env::var("RW_TOKEN").unwrap_or(DEFAULT_TOKEN.to_string());
-        let notification = env::var("RW_NOTIFY").map(|s| s.parse().unwrap_or_default()).unwrap_or(DEFAULT_NOTIFICATION);
+        let notification = env::var("RW_NOTIFY")
+            .map(|s| s.parse().unwrap_or_default())
+            .unwrap_or(DEFAULT_NOTIFICATION);
 
-        Ok(Self { url, token, notification })
+        Ok(Self {
+            url,
+            token,
+            notification,
+        })
     }
 
     pub fn from_file() -> io::Result<Self> {
@@ -113,12 +125,13 @@ impl Environment {
     }
 }
 
-
 #[derive(Debug)]
 pub enum NotificationType {
     None,
     Window(Vec<String>),
-    File(PathBuf)
+    File(PathBuf),
+    SharedMemoryA(Option<SharedMemMap>, String),
+    SharedMemoryW(Option<SharedMemMap>, Vec<u16>),
 }
 
 impl Default for NotificationType {
@@ -142,14 +155,27 @@ impl FromStr for NotificationType {
             }
 
             Ok(Self::Window(classes))
-
         } else if s.starts_with("File(") && s.ends_with(")") {
             let start = s.find('(').expect("string is dropped?") + 1;
             let end = s.find(')').expect("string is dropped?");
             let value = &s[start..end];
 
             Ok(NotificationType::File(PathBuf::from(value)))
-            
+        } else if s.starts_with("SharedMemory(") && s.ends_with(")") {
+            let start = s.find('(').expect("string is dropped?") + 1;
+            let end = s.find(')').expect("string is dropped?");
+            let value = &s[start..end];
+
+            Ok(NotificationType::SharedMemoryA(None, format!("{value}\0")))
+        } else if s.starts_with("SharedMemoryW(") && s.ends_with(")") {
+            let start = s.find('(').expect("string is dropped?") + 1;
+            let end = s.find(')').expect("string is dropped?");
+            let value = &s[start..end];
+
+            Ok(NotificationType::SharedMemoryW(
+                None, 
+                value.encode_utf16().chain(std::iter::once(0)).collect(),
+            ))
         } else {
             Err("no valid value found. It should be either Window(<class_name> -> <class_name?>) or File(<file_path>)")
         }

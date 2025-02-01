@@ -1,6 +1,6 @@
 use std::{fs, path::Path};
 
-use crate::env::NotificationType;
+use crate::{env::NotificationType, shared_mem};
 use windows::{core::*, Win32::{Foundation::*, UI::WindowsAndMessaging::*}};
 
 fn find_window(parent: Option<HWND>, class: Option<&str>, title: Option<&str>) -> Result<HWND> {
@@ -32,11 +32,13 @@ fn find_window_recursive(hieraci: &[String]) -> Option<HWND> {
         Some(window)
 }
 
-pub fn read_text(notitype: &NotificationType) -> Option<String> {
+pub fn read_text(notitype: &mut NotificationType) -> Option<String> {
     match notitype {
         NotificationType::None => None,
         NotificationType::Window(vec) => read_window_text(vec),
         NotificationType::File(path_buf) => read_file(path_buf),
+        NotificationType::SharedMemoryA(memmap, name) => shared_mem::read_shared_mem(memmap, name),
+        NotificationType::SharedMemoryW(memmap, name) => shared_mem::read_shared_mem_wide(memmap, name),
     }
 }
 

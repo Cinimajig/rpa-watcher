@@ -6,6 +6,7 @@ mod http;
 mod privilage;
 mod process;
 mod notification;
+mod shared_mem;
 
 use dbg::*;
 use rpa::*;
@@ -18,7 +19,7 @@ const RPA_PROCESSES: &[&str] = &[
 ];
 
 fn main() -> io::Result<Infallible> {
-    let env = env::Environment::from_file_then_env();
+    let mut env = env::Environment::from_file_then_env();
     dbg_output(format!("<RPA.Watcher> {env:?}"));
 
     let dump = std::env::args()
@@ -94,7 +95,7 @@ fn main() -> io::Result<Infallible> {
                     }
                 }
 
-                rpa_data.notification = notification::read_text(&env.notification);
+                rpa_data.notification = notification::read_text(&mut env.notification);
 
                 items.push(rpa_data);
             }
