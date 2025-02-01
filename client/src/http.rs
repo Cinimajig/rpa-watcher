@@ -9,18 +9,3 @@ pub fn post(
         .send_json(data)?;
     Ok(res)
 }
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn get_request() -> Result<(), Box<dyn std::error::Error>> {
-        let res = ureq::get("https://api.sampleapis.com/beers/ale").call()?;
-
-        if res.status() >= 200 && res.status() < 300 {
-            Ok(())
-        } else {
-            Err(ureq::Error::from(res).into())
-        }
-    }
-}
