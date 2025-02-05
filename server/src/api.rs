@@ -185,7 +185,7 @@ async fn post_checkin(
             let mut value = RpaValue::new(now, item);
 
             match value.data.engine {
-                rpa::RpaEngine::PowerAutomate if value.data.name.is_none() => {
+                rpa::RpaEngine::PowerAutomate|rpa::RpaEngine::PowerAutomateV2 if value.data.name.is_none() => {
                     if let Some(paapi) = state.paapi.clone() {
                         let mut client = paapi.write().await;
                         let Some(id) = value.data.flow_id.as_ref() else {
@@ -229,7 +229,7 @@ async fn post_checkin(
                         }
                     }
                 }
-                rpa::RpaEngine::ProcessRobot | rpa::RpaEngine::PowerAutomate => (),
+                rpa::RpaEngine::ProcessRobot | rpa::RpaEngine::PowerAutomate | rpa::RpaEngine::PowerAutomateV2 => (),
             }
             data.insert(instance, value);
         }

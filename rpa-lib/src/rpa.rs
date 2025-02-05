@@ -14,22 +14,31 @@ pub enum RpaEngine {
     ProcessRobot,
     #[serde(rename = "Power Automate")]
     PowerAutomate,
+    #[serde(rename = "Power Automate V2")]
+    PowerAutomateV2,
 }
 
 impl RpaEngine {
     /// Gets the process name of the RPA enginge.
     pub const fn process_name(&self) -> &'static str {
+        use RpaEngine::*;
+
         match self {
-            Self::ProcessRobot => "ProcessRobot.Process.exe",
-            Self::PowerAutomate => "PAD.Robot.exe",
+            ProcessRobot => "ProcessRobot.Process.exe",
+            PowerAutomate => "PAD.Robot.exe",
+            PowerAutomateV2 => "PAD.RobotV2.exe",
         }
     }
 
     /// Gets the process name of the RPA enginge.
     pub const fn process_name_lowercase(&self) -> &'static str {
+        use RpaEngine::*;
+
         match self {
-            Self::ProcessRobot => "processrobot.process.exe",
-            Self::PowerAutomate => "pad.robot.exe",
+            ProcessRobot => "processrobot.process.exe",
+            PowerAutomate => "pad.robot.exe",
+            PowerAutomateV2 => "pad.robotv2.exe",
+            
         }
     }
 
@@ -119,7 +128,7 @@ impl RpaData {
                     }
                 }
             }
-            RpaEngine::PowerAutomate => {
+            RpaEngine::PowerAutomate|RpaEngine::PowerAutomateV2 => {
                 match find_parameter(&args, "--runid ", SMALL_GUID_LENGTH) {
                     Some(run_id) => format!(
                         "{}-{}-{}-{}-{}",
@@ -148,7 +157,7 @@ impl RpaData {
         // };
 
         let flow_id = match engine {
-            RpaEngine::PowerAutomate => {
+            RpaEngine::PowerAutomate|RpaEngine::PowerAutomateV2 => {
                 find_parameter(&args, "--flowid ", SMALL_GUID_LENGTH).map(|s| {
                     format!(
                         "{}-{}-{}-{}-{}",
@@ -165,14 +174,14 @@ impl RpaData {
 
         let trigger = match engine {
             RpaEngine::ProcessRobot => None,
-            RpaEngine::PowerAutomate if args.contains("--trigger cloud") => {
+            RpaEngine::PowerAutomate|RpaEngine::PowerAutomateV2 if args.contains("--trigger cloud") => {
                 Some(RpaTrigger::Unattended)
             }
-            RpaEngine::PowerAutomate => Some(RpaTrigger::Attended),
+            RpaEngine::PowerAutomate|RpaEngine::PowerAutomateV2 => Some(RpaTrigger::Attended),
         };
 
         let parent_instance = match engine {
-            RpaEngine::PowerAutomate => find_parameter(&args, "--rootrunid ", SMALL_GUID_LENGTH)
+            RpaEngine::PowerAutomate|RpaEngine::PowerAutomateV2 => find_parameter(&args, "--rootrunid ", SMALL_GUID_LENGTH)
                 .map(|s| {
                     format!(
                         "{}-{}-{}-{}-{}",

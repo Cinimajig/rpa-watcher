@@ -14,6 +14,7 @@ use std::{convert::Infallible, io, thread, time};
 use windows::core::*;
 
 const RPA_PROCESSES: &[&str] = &[
+    RpaEngine::PowerAutomateV2.process_name(),
     RpaEngine::PowerAutomate.process_name(),
     RpaEngine::ProcessRobot.process_name(),
 ];
@@ -70,7 +71,7 @@ fn main() -> io::Result<Infallible> {
                 // };
 
                 'name_and_action: {
-                    if rpa_data.engine == RpaEngine::PowerAutomate {
+                    if rpa_data.engine == RpaEngine::PowerAutomateV2 || rpa_data.engine == RpaEngine::PowerAutomate {
                         let Some(path_run) = process::find_log_path(
                             &cmdline,
                             &rpa_data.flow_id.clone().unwrap_or_default(),
