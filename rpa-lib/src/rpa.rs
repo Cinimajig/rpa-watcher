@@ -47,7 +47,9 @@ impl RpaEngine {
             Some(Self::ProcessRobot)
         } else if name.eq_ignore_ascii_case(Self::PowerAutomate.process_name()) {
             Some(Self::PowerAutomate)
-        } else {
+        } else if name.eq_ignore_ascii_case(Self::PowerAutomateV2.process_name()) {
+            Some(Self::PowerAutomate) // Not a bug!
+        }  else {
             None
         }
     }
