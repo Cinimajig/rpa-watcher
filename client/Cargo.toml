@@ -1,9 +1,10 @@
 [package]
 name = "rpa-watcher"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 
 [features]
+default = []
 windows = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,15 +12,16 @@ windows = []
 [[bin]]
 name = "rpa-watcher"
 path = "src/main.rs"
-required-features = ["windows"]
+features = []
 
 [[bin]]
 name = "rpa-watcherw"
 path = "src/main.rs"
+required-features = ["windows"]
 
 [dependencies]
 # curl = "0.4.44"
-ureq = { version = "2.9.6", features = ["json", "charset"] }
+ureq = { version = "3.0.4", features = ["json", "charset"] }
 serde = "1.0.197"
 serde_json = "1.0.116"
 rpa = { path = "../rpa-lib" }
