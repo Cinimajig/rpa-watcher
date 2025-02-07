@@ -5,6 +5,9 @@ const rpaHistoryView = document.querySelector('#rpa-history');
 const historyViewContainer = document.querySelector('#history-view');
 const info = document.querySelector('.no-info');
 
+let getRpaDataLink = '/api/getrpa';
+let getHistoryRpaDataLink = '/api/gethistory?amount=50';
+
 const subflow = `<img src="Down_Right.svg" alt="Child flow" class="image" />`;
 const defaultLogo = `<img src="parent.svg" alt="Unknown engine or child flow" class="image" />`;
 let paLogo = `<img src="PALogo.png" alt="Power Automate" class="image" />`;
@@ -351,10 +354,8 @@ const appendItems = (root, items, noParent) => {
 }
 
 const getRpaRunIds = () => rpaData.keys();
-const getHistoryRpaData = async () => (await fetch('/api/gethistory?amount=50')).json()
-const getRpaData = async () => (await fetch('/api/getrpa')).json();
-// const getRpaData = async () => (await fetch('/api/gettemplate')).json();
-// const getHistoryRpaData = async () => (await fetch('/api/gethistorytemplate?amount=50')).json()
+const getHistoryRpaData = async () => (await fetch(getHistoryRpaDataLink)).json()
+const getRpaData = async () => (await fetch(getRpaDataLink)).json();
 
 const clearCanvasEx = () => {
     rpaData.clear();
@@ -384,8 +385,17 @@ const timer = setInterval(() => {
 }, intervalSeconds * 1000);
 buildRpaRuns(false);
 
-globalThis.clearTimer = (really) => {
-    if (really === 'Really') {
-        clearInterval(timer);
-    }
+globalThis.clearTimer = () => {
+    clearInterval(timer);
+}
+
+globalThis.testdata = () => {
+    getRpaDataLink = '/api/gettemplate';
+    getHistoryRpaDataLink = '/api/gethistorytemplate';
+    clearInterval(timer);
+    
+    buildRpaRuns(true).catch((err) => {
+        clearCanvasEx();
+        console.error(err);
+    })
 }
