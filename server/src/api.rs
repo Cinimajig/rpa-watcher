@@ -72,6 +72,7 @@ pub fn router(database: GlobalState) -> Router {
         .route("/gettemplate", get(get_rpadata_template))
         .route("/getfailed", get(get_failed_rpadata))
         .route("/gethistory", get(get_history_rpadata))
+        .route("/gethistorytemplate", get(get_rpadata_template))
         .route("/checkin", post(post_checkin))
         .with_state(database)
         .fallback(crate::fallback)
@@ -309,12 +310,12 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
                 name: "Nothing".to_string(),
                 function_name: "Main".to_string(),
                 index: 1,
-                inside_error_handling: false,
+                inside_error_handling: true,
             }),
             trigger: Some(Unattended),
             flow_id: Some("Flow A".to_string()),
             parent_instance: None,
-            notification: None,
+            notification: Some("Doing something...".to_string()),
         },
         RpaData {
             engine: PowerAutomate,
@@ -331,7 +332,7 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
             trigger: Some(Unattended),
             flow_id: Some("Flow B".to_string()),
             parent_instance: Some("Instance A".to_string()),
-            notification: None,
+            notification: Some("Not much happening".to_string()),
         },
         RpaData {
             engine: PowerAutomate,

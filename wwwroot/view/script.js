@@ -150,7 +150,7 @@ const appendItemsEx = (root, items, noParent) => {
         const engine = newRunItem.querySelector('.item.engine');
         const trigger = newRunItem.querySelector('.item.trigger');
         const started = newRunItem.querySelector('.item.started');
-        const parent = newRunItem.querySelector('.item.parent');
+        // const parent = newRunItem.querySelector('.item.parent');
 
         // .action
         const action = newRunItem.querySelector('.action.row');
@@ -207,7 +207,7 @@ const appendItemsEx = (root, items, noParent) => {
         }
         
         if (!noParent && rpa[1].parentInstance) {
-            parent.innerText = findParent(rpa[1].parentInstance);
+            // parent.innerText = findParent(rpa[1].parentInstance);
             let parentElement = document.querySelector(`.process[data-ref="${rpa[1].parentInstance}"]`);
             
             // engine.innerHTML = defaultLogo;
@@ -331,24 +331,30 @@ const appendItems = (root, items, noParent) => {
             started.innerText = '';
         }
 
-        if (!noParent && rpa[1].parentInstance) {
-            parent.innerText = rpa[1].parentInstance?.trim();
-            let parentElement = document.querySelector(`.tr.rpa-info[data-ref="${rpa[1].parentInstance}"`);
-
-            engine.innerHTML = defaultLogo;
-            if (parentElement && parentElement.nextSibling) {
-                root.insertBefore(tr, parentElement.nextSibling);
-                continue;
-            }
+        if (rpa[1].notification) {
+            parent.innerText = rpa[1].notification.trim();
         }
+
+        // if (!noParent && rpa[1].parentInstance) {
+        //     parent.innerText = rpa[1].parentInstance?.trim();
+        //     let parentElement = document.querySelector(`.tr.rpa-info[data-ref="${rpa[1].parentInstance}"`);
+
+        //     engine.innerHTML = defaultLogo;
+        //     if (parentElement && parentElement.nextSibling) {
+        //         root.insertBefore(tr, parentElement.nextSibling);
+        //         continue;
+        //     }
+        // }
 
         root.appendChild(tr);
     }
 }
 
 const getRpaRunIds = () => rpaData.keys();
-const getRpaData = async () => (await fetch('/api/getrpa')).json();
 const getHistoryRpaData = async () => (await fetch('/api/gethistory?amount=50')).json()
+const getRpaData = async () => (await fetch('/api/getrpa')).json();
+// const getRpaData = async () => (await fetch('/api/gettemplate')).json();
+// const getHistoryRpaData = async () => (await fetch('/api/gethistorytemplate?amount=50')).json()
 
 const clearCanvasEx = () => {
     rpaData.clear();
