@@ -354,19 +354,13 @@ const appendItems = (root, items, noParent) => {
 }
 
 const getRpaRunIds = () => rpaData.keys();
-const getHistoryRpaData = async () => (await fetch(getHistoryRpaDataLink)).json()
-const getRpaData = async () => (await fetch(getRpaDataLink)).json();
-
-const clearCanvasEx = () => {
-    rpaData.clear();
-    historyRpaData.clear();
-    rpaRuns.innerHTML = '';
-}
+const getHistoryRpaData = async () => await fetch(getHistoryRpaDataLink).json();
+const getRpaData = async () => await fetch(getRpaDataLink).json();
 
 const clearCanvas = () => {
     rpaData.clear();
     historyRpaData.clear();
-    rpaView.innerHTML = '';
+    rpaRuns.innerHTML = '';
 }
 
 const iteratorIncludes = (item, iter) => {
@@ -379,7 +373,7 @@ const iteratorIncludes = (item, iter) => {
 
 const timer = setInterval(() => {
     buildRpaRuns(true).catch((err) => {
-        clearCanvasEx();
+        clearCanvas();
         console.error(err);
     })
 }, intervalSeconds * 1000);
@@ -393,9 +387,9 @@ globalThis.testdata = () => {
     getRpaDataLink = '/api/gettemplate';
     getHistoryRpaDataLink = '/api/gethistorytemplate';
     clearInterval(timer);
-    
+
     buildRpaRuns(true).catch((err) => {
-        clearCanvasEx();
+        clearCanvas();
         console.error(err);
     })
 }
