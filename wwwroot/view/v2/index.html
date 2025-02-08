@@ -6,12 +6,65 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="fira_code.css">
     <link rel="stylesheet" href="style.css">
     <script src="alpine.min.js" defer></script>
-    <script type="module" src="script.js" defer></script>
     <title>RPA.Watcher</title>
 </head>
 <body>
-    
+    <h1>RPA.Watcher</h1>
+    <main x-data="rpaData">
+        <template x-if="hasError">
+            <div class="error" x-text="lastError"></div>
+        </template>
+        <table x-show="running.size != 0">
+            <thead>
+                <th>Engine</th>
+                <th>Host</th>
+                <th>Started</th>
+                <th>Trigger</th>
+                <th>Name</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <template x-for="item in running">
+                    <tr class="run">
+                        <td class="engine" x-html="engineLogo(item.engine)"></td>
+                        <td class="host" x-text="item.computer"></td>
+                        <td class="date" x-text="localDate(item.started)"></td>
+                        <td class="trigger" x-text="item.trigger"></td>
+                        <td class="name" x-text="item.name"></td>
+                        <td class="msg" x-text="item.notification"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+        <br />
+        <div x-show="history.size != 0">History:</div>
+        <table x-show="history.size != 0">
+            <thead>
+                <th>Engine</th>
+                <th>Host</th>
+                <th>Started</th>
+                <th>Trigger</th>
+                <th>Name</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <template x-for="item in history">
+                    <tr class="run">
+                        <td class="engine" x-html="engineLogo(item.engine)"></td>
+                        <td class="host" x-text="item.computer"></td>
+                        <td class="date" x-text="item.started"></td>
+                        <td class="trigger" x-text="item.trigger"></td>
+                        <td class="name" x-text="item.name"></td>
+                        <td class="msg" x-text="item.notification"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>

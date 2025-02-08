@@ -354,8 +354,8 @@ const appendItems = (root, items, noParent) => {
 }
 
 const getRpaRunIds = () => rpaData.keys();
-const getHistoryRpaData = async () => await fetch(getHistoryRpaDataLink).json();
-const getRpaData = async () => await fetch(getRpaDataLink).json();
+const getHistoryRpaData = async () => (await fetch(getHistoryRpaDataLink)).json();
+const getRpaData = async () => (await fetch(getRpaDataLink)).json();
 
 const clearCanvas = () => {
     rpaData.clear();
