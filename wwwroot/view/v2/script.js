@@ -11,9 +11,14 @@ let timeZone = null;
 let noBlue = false;
 let noRed = false;
 
+const parseBool = (str) => str.trim().toLowerCase() == 'true';
 
-const parseBool = (str) => {
-    return str.trim().toLowerCase() == 'true'
+const parseTrigger = (str) => {
+    const prefix = 'Started from Console by';
+    if (str.startsWith(prefix)) {
+        return str.slice(prefix.length).trim();
+    }
+    return str;
 }
 
 for (let param of window.location.search.substring(1).split('&')) {
@@ -51,6 +56,11 @@ for (let param of window.location.search.substring(1).split('&')) {
     }
 }
 
+const getdata = async (uri) => {
+    const res = await fetch(uri);
+    return await res.text();
+}
+
 document.addEventListener('alpine:init', () => {
     Alpine.data('rpaData', () => ({
         running: [],
@@ -69,16 +79,16 @@ document.addEventListener('alpine:init', () => {
         },
 
         async retrieveData() {
-            const data = await (await fetch(rpaDataLink)).json();
-            const history = await (await fetch(historyRpaDataLink)).json();
+            const data = await fetch(rpaDataLink);
+            const history = await fetch(historyRpaDataLink);
 
-            this.running = data;
+            this.running = await data.json();
             // this.running.clear();
             // for (let item of data) {
             //     // this.running.set(item.instance, item);
             // }
 
-            this.history = history;
+            this.history = await history.json();
             // this.history.clear();
             // for (let item of history) {
             //     this.history.set(item.instance, item);
@@ -109,15 +119,25 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        exist(item) {
+            if (item) {
+                return true;
+            }
+            return false;
+        },
+
         // This code will be executed before Alpine
         // initializes the rest of the component.
         init() {
-            this.retrieveData().catch(err => {
+            this.retrieveData()
+            .catch(err => {
                 this.lastError = err;
             });
 
             setInterval(() => {
-                this.retrieveData().then(() => this.lastError = '').catch(err => {
+                this.retrieveData()
+                .then(() => this.lastError = '')
+                .catch(err => {
                     this.lastError = err;
                 });
             }, intervalSeconds * 1000);

@@ -312,10 +312,10 @@ async fn get_rpadata_template() -> Result<Json<Vec<RpaData>>, StatusCode> {
                 index: 1,
                 inside_error_handling: true,
             }),
-            trigger: Some(Unattended),
+            trigger: Some(Custom("Started from Console by Administrator".to_string())),
             flow_id: Some("Flow A".to_string()),
             parent_instance: None,
-            notification: Some("Doing something...".to_string()),
+            notification: Some("Doing something very boring and teadius...".to_string()),
         },
         RpaData {
             engine: PowerAutomate,

@@ -6,7 +6,7 @@ const historyViewContainer = document.querySelector('#history-view');
 const info = document.querySelector('.no-info');
 
 let getRpaDataLink = '/api/getrpa';
-let getHistoryRpaDataLink = '/api/gethistory?amount=50';
+let getHistoryRpaDataLink = '/api/gettemplate?amount=50';
 
 const subflow = `<img src="Down_Right.svg" alt="Child flow" class="image" />`;
 const defaultLogo = `<img src="parent.svg" alt="Unknown engine or child flow" class="image" />`;
