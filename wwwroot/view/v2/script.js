@@ -1,12 +1,15 @@
 const intervalSeconds = 5;
 
-let rpaDataLink = '/api/gettemplate';
-let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
+let rpaDataLink = '/api/getrpa';
+let historyRpaDataLink = '/api/gethistory?amount=50';
+// let rpaDataLink = '/api/gettemplate';
+// let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
 
 const subflow = `<img src="../Down_Right.svg" alt="Child flow" class="image" />`;
 const defaultLogo = `<img src="../parent.svg" alt="Unknown engine or child flow" class="image" />`;
 let paLogo = `<img src="../PALogo.png" alt="Power Automate" class="image" />`;
 let prLogo = `<img src="../PRLogo.png" alt="ProcessRobot" class="image" />`;
+let darkMode = window.matchMedia("(prefers-color-scheme: dark)");
 let timeZone = null;
 let noBlue = false;
 let noRed = false;
@@ -50,7 +53,12 @@ for (let param of window.location.search.substring(1).split('&')) {
             break;
         case 'dark':
             if (value ? parseBool(value) : true) {
-                document.body.classList.add('dark');
+                document.body.setAttribute("data-theme", 'dark');
+            }
+            break;
+        case 'dark':
+            if (value ? parseBool(value) : true) {
+                document.body.setAttribute("data-theme", 'light');
             }
             break;
     }

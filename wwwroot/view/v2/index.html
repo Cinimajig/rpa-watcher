@@ -13,7 +13,7 @@
     <title>RPA.Watcher</title>
 </head>
 
-<body>
+<body data-theme="light">
     <main x-data="rpaData">
         <template x-if="hasError">
             <div class="error" x-text="lastError"></div>
@@ -43,9 +43,9 @@
                         <span class="msg no-overflow" x-text="item.notification"></span>
                     </div>
                     <div class="action" x-show="exist(item.action)">
-                        <span class="trigger trigger-fn" x-text="item.action.functionName"></span>,
-                        <span class="trigger trigger-index" x-text="item.action.index"></span>,
-                        <span class="trigger trigger-name" x-text="item.action.name"></span>
+                        <span class="trigger trigger-fn italic" x-text="item.action.functionName"></span>,
+                        <span class="trigger trigger-index italic" x-text="item.action.index"></span>,
+                        <span class="trigger trigger-name italic" x-text="item.action.name"></span>
                     </div>
                 </div>
             </template>

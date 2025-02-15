@@ -1,5 +1,5 @@
-@media (prefers-color-scheme: light) {
-    :root {
+/* @media (prefers-color-scheme: light) { */
+    [data-theme="light"] {
         --text: #4c4f69;
         --crust: #dce0e8;
         --mantle: #e6e9ef;
@@ -8,10 +8,10 @@
         --subtext0: #6c6f85;
         --overlay1: #8c8fa1;
     }
-}
+/* } */
 
-@media (prefers-color-scheme: dark) {
-    :root {
+/* @media (prefers-color-scheme: dark) { */
+    [data-theme="dark"] {
         --text: #cdd6f4;
         --crust: #11111b;
         --mantle: #181825;
@@ -20,7 +20,7 @@
         --subtext0: #a6adc8;
         --overlay1: #7f849c;
     }
-}
+/* } */
 
 body {
     width: 100vw;
@@ -84,8 +84,10 @@ div.view-container {
         background-color: var(--mantle);
     }
 
-    .run .trigger               { font-style: italic; }
-    .run .trigger::before       { color: var(--overlay1); }
+    .run .trigger::before       {
+        font-style: italic; 
+        color: var(--overlay1);
+    }
     .run .trigger-fn::before    { content: 'Subflow: '; }
     .run .trigger-index::before { content: 'Index: '; } 
     .run .trigger-name::before  { content: 'Action: '; }
@@ -107,7 +109,7 @@ div.view-container {
     }
 
 .action {
-    text-align: left;
-    padding-left: 1rem;
     padding-bottom: 1rem;
+    text-align: center;
+    /* padding-left: 1rem; */
 }
