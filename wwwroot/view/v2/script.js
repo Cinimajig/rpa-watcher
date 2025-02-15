@@ -120,10 +120,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         exist(item) {
-            if (item) {
-                return true;
-            }
-            return false;
+            return !!item;
         },
 
         // This code will be executed before Alpine
