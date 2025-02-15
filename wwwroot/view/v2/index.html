@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <script src="alpine.min.js" defer></script>
     <title>RPA.Watcher</title>
 </head>
+
 <body>
     <main x-data="rpaData">
         <template x-if="hasError">
@@ -29,21 +31,19 @@
             </div>
 
             <template x-for="item in running">
-                <div class="row run">
+                <div class="row">
                     <span class="engine short" x-html="engineLogo(item.engine)"></span>
                     <span class="host mid" x-text="item.computer"></span>
                     <span class="date mid" x-text="localDate(item.started)"></span>
                     <span class="trigger" x-text="parseTrigger(item.trigger)"></span>
                     <span class="name" x-text="item.name"></span>
                     <span class="msg no-overflow" x-text="item.notification"></span>
-                </div>
-                <template x-if="item.action">
-                    <div class="action">
+                    <div class="action" x-show="exist(item.action)">
                         <span class="trigger-fn" x-text="item.action.functionName"></span>
                         <span class="trigger-index" x-text="item.action.index"></span>
                         <span class="trigger-name" x-text="item.action.name"></span>
                     </div>
-                </template>
+                </div>
             </template>
         </div>
 
@@ -72,4 +72,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

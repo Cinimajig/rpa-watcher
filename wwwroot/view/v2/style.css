@@ -1,10 +1,31 @@
+@media (prefers-color-scheme: light) {
+    :root {
+        --text: #4c4f69;
+        --crust: #dce0e8;
+        --mantle: #e6e9ef;
+        --base: #eff1f5;
+        --rosenwater: #dc8a78;
+        --subtext0: #6c6f85;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text: #cdd6f4;
+        --crust: #11111b;
+        --mantle: #181825;
+        --base: #1e1e2e;
+        --rosenwater: #f5e0dc;
+        --subtext0: #a6adc8;
+    }
+}
+
 body {
     width: 100vw;
     margin: 0;
-    background-color: aliceblue;
+    background-color: var(--crust);
+    color: var(--text);
     font-family: 'Fira Code', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #dce0e8;
-    color: #4c4f69;
 }
 
 main > h1 {
@@ -12,9 +33,9 @@ main > h1 {
 }
 
 div.view-container {
+    background-color: var(--base);
     width: 95vw;
     max-width: 1800px;
-    background-color: white;
     margin: 8px auto;
     text-align: center;
     border-radius: 1rem;
@@ -40,7 +61,11 @@ div.view-container {
         white-space: nowrap;
     }
 
-    div.run .engine img {
+    .row:nth-child(2n) {
+        background-color: var(--mantle);
+    }
+
+    div.row .engine img {
         height: 1.5em;
     }
 
@@ -54,4 +79,12 @@ div.view-container {
 
     .row .no-overflow {
         text-overflow: unset;
+    }
+
+    .row .action {
+
+    }
+
+    .row .name {
+        font-weight: bold;
     }
