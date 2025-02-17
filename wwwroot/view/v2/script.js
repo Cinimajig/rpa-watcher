@@ -1,7 +1,7 @@
 const intervalSeconds = 5;
 
-let rpaDataLink = '/api/gettemplate';
-let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
+let rpaDataLink = '/api/getrpa';
+let historyRpaDataLink = '/api/gethistory?amount=50';
 // let rpaDataLink = '/api/gettemplate';
 // let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
 
