@@ -14,10 +14,6 @@ let timeZone = null;
 let noBlue = false;
 let noRed = false;
 
-if (darkMode) {
-    document.body.setAttribute("data-theme", 'dark');
-}
-
 const parseBool = (str) => str.trim().toLowerCase() == 'true';
 
 const parseTrigger = (str) => {
@@ -68,6 +64,10 @@ for (let param of window.location.search.substring(1).split('&')) {
     }
 }
 
+if (darkMode && !document.body.getAttribute("data-theme")) {
+    document.body.setAttribute("data-theme", 'dark');
+}
+
 const getdata = async (uri) => {
     const res = await fetch(uri);
     return await res.text();
@@ -88,6 +88,9 @@ document.addEventListener('alpine:init', () => {
 
         sortRuns(list) {
             // list.sort((a, b) => a.started > b.started ? 1 : -1);
+            // Minus == a before b
+            // Positive == a after b
+            // Zero == the same
             list.sort((a, b) => {
                 if (!a.parentInstance) {
                     return -5;
@@ -105,8 +108,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         async retrieveData() {
-            const data = await fetch(rpaDataLink);
-            const history = await fetch(historyRpaDataLink);
+            const [data, history] = await Promise.all([fetch(rpaDataLink), fetch(historyRpaDataLink)]);
 
             this.running = await data.json();
             this.sortRuns(this.running);
@@ -116,7 +118,6 @@ document.addEventListener('alpine:init', () => {
             // }
 
             this.history = await history.json();
-            this.sortRuns(this.history);
             // this.history.clear();
             // for (let item of history) {
             //     this.history.set(item.instance, item);
