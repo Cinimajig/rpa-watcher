@@ -54,6 +54,7 @@ div.view-container {
 }
     #hist-title {
         text-align: left;
+        margin: 8px;
     }
 
     .row {

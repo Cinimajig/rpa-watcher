@@ -20,7 +20,8 @@
         </template>
         <h1>RPA.Watcher</h1>
 
-        <div class="view-container" id="running" x-show="running.size !== 0">
+        <p x-show="running.length === 0">&lt;Nothing is running&gt;</p>
+        <div class="view-container" id="running" x-show="running.length !== 0">
             <div class="run">
                 <div class="row header">
                     <span class="short">Engine</span>
@@ -51,8 +52,8 @@
             </template>
         </div>
 
-        <p id="hist-title" x-show="history.size !== 0"><i>History:</i></p>
-        <div class="view-container" id="history" x-show="history.size !== 0">
+        <p id="hist-title" x-show="history.length !== 0"><i>History:</i></p>
+        <div class="view-container" id="history" x-show="history.length !== 0">
             <div class="row header">
                 <span class="short">Engine</span>
                 <span class="mid">Host</span>

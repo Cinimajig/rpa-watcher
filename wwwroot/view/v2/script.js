@@ -1,7 +1,7 @@
 const intervalSeconds = 5;
 
-let rpaDataLink = '/api/getrpa';
-let historyRpaDataLink = '/api/gethistory?amount=50';
+let rpaDataLink = '/api/gettemplate';
+let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
 // let rpaDataLink = '/api/gettemplate';
 // let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
 
@@ -82,8 +82,8 @@ document.addEventListener('alpine:init', () => {
             return false;
         },
 
-        sortedRuns() {
-            return [...this.running].sort((a, b) => a[1].started > b[1].started ? 1 : -1);
+        sortRuns(list) {
+            list.sort((a, b) => a.started > b.started ? 1 : -1);
         },
 
         async retrieveData() {
@@ -91,12 +91,14 @@ document.addEventListener('alpine:init', () => {
             const history = await fetch(historyRpaDataLink);
 
             this.running = await data.json();
+            this.sortRuns(this.running);
             // this.running.clear();
             // for (let item of data) {
             //     // this.running.set(item.instance, item);
             // }
 
             this.history = await history.json();
+            this.sortRuns(this.history);
             // this.history.clear();
             // for (let item of history) {
             //     this.history.set(item.instance, item);
@@ -118,9 +120,9 @@ document.addEventListener('alpine:init', () => {
             try {
                 const dt = new Date(str);
                 if (timeZone) {
-                    return dt.toLocaleString(timeZone);
+                    return dt.toLocaleString(timeZone).replace(',', '');
                 } else {
-                    return dt.toLocaleString();
+                    return dt.toLocaleString().replace(',', '');
                 }
             } catch {
                 return '';
