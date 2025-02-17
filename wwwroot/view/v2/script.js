@@ -14,6 +14,10 @@ let timeZone = null;
 let noBlue = false;
 let noRed = false;
 
+if (darkMode) {
+    document.body.setAttribute("data-theme", 'dark');
+}
+
 const parseBool = (str) => str.trim().toLowerCase() == 'true';
 
 const parseTrigger = (str) => {
@@ -83,7 +87,21 @@ document.addEventListener('alpine:init', () => {
         },
 
         sortRuns(list) {
-            list.sort((a, b) => a.started > b.started ? 1 : -1);
+            // list.sort((a, b) => a.started > b.started ? 1 : -1);
+            list.sort((a, b) => {
+                if (!a.parentInstance) {
+                    return -5;
+                }
+                if (a.parentInstance === b.parentInstance) {
+                    return -4;
+                }
+
+                if (a.started < b.started) {
+                    return -3;
+                }
+
+                return 1;
+            });
         },
 
         async retrieveData() {
