@@ -23,20 +23,20 @@
         <p x-show="running.length === 0">&lt;Nothing is running&gt;</p>
         <div class="view-container" id="running" x-show="running.length !== 0">
             <div class="run">
-                <div class="row header">
+                <!-- <div class="row header">
                     <span class="short">Platform</span>
                     <span class="mid">Host</span>
                     <span class="mid">Started</span>
                     <span>Trigger</span>
                     <span>Name</span>
                     <span>Status</span>
-                </div>
+                </div> -->
             </div>
 
             <template x-for="item in running">
                 <div class="run">
                     <div class="row">
-                        <span class="engine short" x-html="engineLogo(item.engine)"></span>
+                        <span class="engine short" x-html="engineLogo(item)"></span>
                         <span class="host mid" x-text="item.computer"></span>
                         <span class="date mid" x-text="localDate(item.started)"></span>
                         <span class="trigger" x-text="parseTrigger(item.trigger)"></span>
@@ -64,7 +64,7 @@
             </div>
             <template x-for="item in history">
                 <div class="row run">
-                    <span class="engine short" x-html="engineLogo(item.engine)"></span>
+                    <span class="engine short" x-html="engineLogo(item)"></span>
                     <span class="host mid" x-text="item.computer"></span>
                     <span class="date mid" x-text="localDate(item.started)"></span>
                     <span class="trigger" x-text="parseTrigger(item.trigger)"></span>

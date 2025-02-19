@@ -124,8 +124,12 @@ document.addEventListener('alpine:init', () => {
             // }
         },
 
-        engineLogo(str) {
-            switch (str) {
+        engineLogo(run) {
+            if (!!run.parentInstance) {
+                return subflow;
+            }
+
+            switch (run.engine) {
                 case 'Power Automate':
                     return paLogo;
                 case 'ProcessRobot':
