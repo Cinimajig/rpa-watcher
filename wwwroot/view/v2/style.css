@@ -69,6 +69,10 @@ div.view-container {
         font-weight: bold;
     }
 
+    #history .row span {
+        white-space: nowrap;
+    }
+
     .row span {
         width: 16%;
         max-width: 16%;
@@ -78,7 +82,6 @@ div.view-container {
         display: inline-block;
         text-overflow: ellipsis;
         overflow: hidden !important;
-        /* white-space: nowrap; */
     }
 
     .run:nth-child(2n) {

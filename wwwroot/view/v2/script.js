@@ -1,9 +1,9 @@
 const intervalSeconds = 5;
 
-let rpaDataLink = '/api/getrpa';
-let historyRpaDataLink = '/api/gethistory?amount=50';
-// let rpaDataLink = '/api/gettemplate';
-// let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
+// let rpaDataLink = '/api/getrpa';
+// let historyRpaDataLink = '/api/gethistory?amount=50';
+let rpaDataLink = '/api/gettemplate';
+let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
 
 const subflow = `<img src="../Down_Right.svg" alt="Child flow" class="image" />`;
 const defaultLogo = `<img src="../parent.svg" alt="Unknown engine or child flow" class="image" />`;
