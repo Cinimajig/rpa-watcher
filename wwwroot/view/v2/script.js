@@ -5,11 +5,12 @@ const intervalSeconds = 5;
 let rpaDataLink = '/api/gettemplate';
 let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
 
-const subflow = `<img src="../Down_Right.svg" alt="Child flow" class="image" />`;
+// const subflow = `<img src="../Down_Right.svg" alt="Child flow" class="image" />`;
+const subflow = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.49 12 3.75 3.75m0 0-3.75 3.75m3.75-3.75H3.74V4.499" /></svg>`;
 const defaultLogo = `<img src="../parent.svg" alt="Unknown engine or child flow" class="image" />`;
 let paLogo = `<img src="../PALogo.png" alt="Power Automate" class="image" />`;
 let prLogo = `<img src="../PRLogo.png" alt="ProcessRobot" class="image" />`;
-let darkMode = window.matchMedia("(prefers-color-scheme: dark)");
+let darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 let timeZone = null;
 let noBlue = false;
 let noRed = false;
@@ -53,20 +54,25 @@ for (let param of window.location.search.substring(1).split('&')) {
             break;
         case 'dark':
             if (value ? parseBool(value) : true) {
-                document.body.setAttribute("data-theme", 'dark');
+                // document.body.setAttribute("data-theme", 'dark');
+                darkMode = true;
             }
             break;
-        case 'dark':
+        case 'light':
             if (value ? parseBool(value) : true) {
-                document.body.setAttribute("data-theme", 'light');
+                // document.body.setAttribute("data-theme", 'light');
+                darkMode = false;
             }
             break;
     }
 }
 
-if (darkMode && !document.body.getAttribute("data-theme")) {
+if (darkMode) {
     document.body.setAttribute("data-theme", 'dark');
+} else {
+    document.body.setAttribute("data-theme", 'light');
 }
+
 
 const getdata = async (uri) => {
     const res = await fetch(uri);
