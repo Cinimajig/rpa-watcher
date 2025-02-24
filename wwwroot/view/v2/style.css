@@ -98,6 +98,10 @@ div.row .engine img, div.row .engine svg {
     height: 1.5em;
 }
 
+#history .row {
+    display: flex;
+}
+
 #history .row span {
     white-space: nowrap;
     width: 16%;
