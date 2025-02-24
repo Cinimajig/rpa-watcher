@@ -1,11 +1,10 @@
 const intervalSeconds = 5;
 
-// let rpaDataLink = '/api/getrpa';
-// let historyRpaDataLink = '/api/gethistory?amount=50';
-let rpaDataLink = '/api/gettemplate';
-let historyRpaDataLink = '/api/gethistorytemplate?amount=50';
+let rpaDataLink = '/api/getrpa';
+let historyRpaDataLink = '/api/gethistory?amount=50';
+let testMode = false;
 
-const subflow = `<img src="../Down_Right.svg" alt="Child flow" class="image" />`;
+const subflow = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round"d="m16.49 12 3.75 3.75m0 0-3.75 3.75m3.75-3.75H3.74V4.499" /></svg>`;
 const defaultLogo = `<img src="../parent.svg" alt="Unknown engine or child flow" class="image" />`;
 let paLogo = `<img src="../PALogo.png" alt="Power Automate" class="image" />`;
 let prLogo = `<img src="../PRLogo.png" alt="ProcessRobot" class="image" />`;
@@ -61,6 +60,12 @@ for (let param of window.location.search.substring(1).split('&')) {
                 document.body.setAttribute("data-theme", 'light');
             }
             break;
+        case 'test':
+            if (value ? parseBool(value) : true) {
+                testMode = true;
+                rpaDataLink = '/api/gettemplate';
+                historyRpaDataLink = '/api/gethistorytemplate?amount=50';
+            }
     }
 }
 
@@ -107,6 +112,14 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
+        runsWithParent(parentInstance) {
+            return this.running.filter(run => run.parentInstance === parentInstance);
+        },
+
+        runsWithoutParents() {
+            return this.running.filter(run => !run.parentInstance);
+        },
+
         async retrieveData() {
             const [data, history] = await Promise.all([fetch(rpaDataLink), fetch(historyRpaDataLink)]);
 
@@ -139,6 +152,10 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        flowName(run) {
+            return run.name ? run.name : run.flowId;
+        },
+
         localDate(str) {
             try {
                 const dt = new Date(str);
@@ -156,9 +173,16 @@ document.addEventListener('alpine:init', () => {
             return !!item;
         },
 
+        resetError() {
+            console.log(testMode);
+            testMode ? this.lastError = 'Error: This is site is in test mode!' : this.lastError = '';
+        },
+
         // This code will be executed before Alpine
         // initializes the rest of the component.
         init() {
+            if (testMode) { this.resetError(); }
+
             this.retrieveData()
             .catch(err => {
                 this.lastError = err;
@@ -166,7 +190,7 @@ document.addEventListener('alpine:init', () => {
 
             setInterval(() => {
                 this.retrieveData()
-                .then(() => this.lastError = '')
+                .then(() => this.resetError())
                 .catch(err => {
                     this.lastError = err;
                 });
