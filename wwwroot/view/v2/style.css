@@ -94,15 +94,9 @@ align-items: center;
 #running .row .triggered::before { content: 'Trigger: '; }
 #running .row .msg::before { content: 'Msg: '; }
 
-<<<<<<< HEAD
-#history .row {
-    display: flex;
+div.row .engine img, div.row .engine svg {
+    height: 1.5em;
 }
-=======
-    div.row .engine img, div.row .engine svg {
-        height: 1.5em;
-    }
->>>>>>> 41ff0251774f04236be3ef3a2800ca3cab4fb33d
 
 #history .row span {
     white-space: nowrap;
