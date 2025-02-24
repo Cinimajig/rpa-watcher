@@ -28,9 +28,9 @@ color: var(--text);
 }
 
 body {
-width: 100vw;
-margin: 0;
-font-family: 'Fira Code', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    width: 100vw;
+    margin: 0;
+    font-family: 'Fira Code', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 main {
@@ -42,8 +42,9 @@ text-align: center;
 }
 
 .error {
-    color: var(--normal);
+    color: var(--base);
     background-color: var(--red);
+    padding: 0.2rem;
 }
 
 div.view-container {
@@ -93,9 +94,15 @@ align-items: center;
 #running .row .triggered::before { content: 'Trigger: '; }
 #running .row .msg::before { content: 'Msg: '; }
 
+<<<<<<< HEAD
 #history .row {
     display: flex;
 }
+=======
+    div.row .engine img, div.row .engine svg {
+        height: 1.5em;
+    }
+>>>>>>> 41ff0251774f04236be3ef3a2800ca3cab4fb33d
 
 #history .row span {
     white-space: nowrap;
