@@ -91,35 +91,41 @@ document.addEventListener('alpine:init', () => {
         lastError: '',
 
         hasError() {
-            if (this.lastError) {
-                return true;
-            }
-            return false;
+            return this.lastError ? true : false;
         },
 
         sortRuns(list) {
-            // list.sort((a, b) => a.started > b.started ? 1 : -1);
+            list.sort((a, b) => a.started > b.started ? 1 : -1);
             // Minus == a before b
             // Positive == a after b
             // Zero == the same
-            list.sort((a, b) => {
-                if (!a.parentInstance) {
-                    return -5;
-                }
-                if (a.parentInstance === b.parentInstance) {
-                    return -4;
-                }
+            // list.sort((a, b) => {
+                // if (!a.parentInstance) {
+                //     return -5;
+                // }
+                // if (a.parentInstance === b.parentInstance) {
+                //     return -4;
+                // }
 
-                if (a.started < b.started) {
-                    return -3;
-                }
+            //     if (a.started < b.started) {
+            //         return -3;
+            //     }
 
-                return 1;
-            });
+            //     return 1;
+            // });
         },
 
+        // Resursive.
         runsWithParent(parentInstance) {
-            return this.running.filter(run => run.parentInstance === parentInstance);
+            let runs = this.running.filter(run => run.parentInstance === parentInstance.instance);
+
+            for (let run of runs) {
+                runs = runs.concat(this.runsWithParent(run));
+            }
+
+            console.log(runs);
+            
+            return runs;
         },
 
         runsWithoutParents() {
@@ -143,8 +149,8 @@ document.addEventListener('alpine:init', () => {
             // }
         },
 
-        engineLogo(run) {
-            if (!!run.parentInstance) {
+        engineLogo(run, useDefault) {
+            if (!!run.parentInstance && useDefault) {
                 return subflow;
             }
 
@@ -159,7 +165,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         flowName(run) {
-            return run.name ? run.name : run.flowId;
+            return run.name ? run.name : run.instance;
         },
 
         localDate(str) {
