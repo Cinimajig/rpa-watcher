@@ -51,7 +51,7 @@
                         <div class="row">
                             <span class="engine" x-html="engineLogo(child, true)"></span>
                             <b><span class="name" x-text="flowName(child)"></span></b>
-                            <div class="action" x-show="exist(item.action)">
+                            <div class="action" x-show="exist(child.action)">
                                 <span class="trigger trigger-fn italic" x-text="child.action.functionName"></span>,
                                 <span class="trigger trigger-index italic" x-text="child.action.index"></span>,
                                 <span class="trigger trigger-name italic" x-text="child.action.name"></span>
