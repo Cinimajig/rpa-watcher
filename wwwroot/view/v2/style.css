@@ -109,6 +109,7 @@ div.view-container {
 
 #history .row {
     display: flex;
+    flex-flow: row;
 }
 
 #history .row span {
@@ -123,7 +124,7 @@ div.view-container {
     max-width: 10%;
 }
 
-.row span {
+#history .row span {
     vertical-align: middle;
     display: inline-block;
     text-overflow: ellipsis;
