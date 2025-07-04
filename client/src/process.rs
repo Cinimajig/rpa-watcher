@@ -72,7 +72,7 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> 
             dwSize: mem::size_of::<PROCESSENTRY32>() as _,
             ..Default::default()
         };
-        let snapshot = SafeHandle::<true>(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)?);
+        let snapshot = SafeHandle::new(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)?);
 
         // First process is always PID 0 or 4 (System Processes). it's needed for Process32Next.
         Process32First(*snapshot, &mut entry)?;
@@ -86,7 +86,7 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> 
             for file in files {
                 if file.as_bytes().eq_ignore_ascii_case(name.to_bytes()) {
                     let process =
-                        SafeHandle(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
+                        SafeHandle::new(OpenProcess(PROCESS_ALL_ACCESS, false, entry.th32ProcessID)?);
                     handles.push(process);
                     break;
                 }
@@ -102,7 +102,7 @@ pub fn find_processes(files: &[&str]) -> windows::core::Result<Vec<SafeHandle>> 
 pub fn get_name(handle: HANDLE) -> windows::core::Result<String> {
     unsafe {
         // Opens the token on the process.
-        let mut token = SafeHandle::<true>(HANDLE(0 as _));
+        let mut token = SafeHandle::new(HANDLE(0 as _));
         OpenProcessToken(handle, TOKEN_QUERY, &mut *token)?;
 
         // Retrieves the size of the user information. Error will be ignored.

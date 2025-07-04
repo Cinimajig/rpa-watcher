@@ -1,9 +1,10 @@
 use std::mem;
 use windows::Win32::{Foundation::*, Security::*, System::Threading::*};
+use crate::handles::SafeHandle;
 
 pub fn enable_debug_priv() -> windows::core::Result<()> {
     unsafe {
-        let mut token = crate::handles::SafeHandle::<true>(HANDLE::default());
+        let mut token = SafeHandle::new(HANDLE::default());
         let mut luid = LUID::default();
 
         OpenProcessToken(
