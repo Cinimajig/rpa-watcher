@@ -1,18 +1,8 @@
 use std::{env, fs, path::PathBuf};
 use windows_exe_info as wi;
 
-/// A macro for creating a [`Path`], but for lazy people.
-macro_rules! p {
-    ($p:expr) => {
-        ::std::path::Path::new($p)
-    };
-    (buf $p:expr) => {
-        ::std::path::PathBuf::from($p)
-    };
-}
-
 /// Macro for repeating x amount of times.
-macro_rules! r {
+macro_rules! repeat {
     ($l:literal, $p:expr) => {
         for _ in 0..$l {
             $p;
@@ -25,7 +15,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let target_dir = {
         let mut out = env::var("OUT_DIR").map(PathBuf::from)?;
-        r!(3, out.pop());
+        repeat!(3, out.pop());
         out
     };
 
@@ -36,8 +26,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     #[cfg(windows)]
     {
-        wi::manifest(p!("assets/manifest.xml"));
-        wi::icon::icon_ico(p!("../assets/rpa-watcher.ico"));
+        wi::manifest("assets/manifest.xml");
+        wi::icon::icon_ico("../assets/rpa-watcher.ico");
         wi::versioninfo::VersionInfo::from_cargo_env().link()?;
     }
 
